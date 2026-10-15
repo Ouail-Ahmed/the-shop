@@ -1,28 +1,34 @@
-# Branch 02: 02-dynamic-values-and-jsx
+# Branch 03: 03-design-system-and-styling
 
 ## React Concept Covered
 
-JSX expressions use curly braces to evaluate JavaScript while React renders. Strings and numbers become text, while booleans, `null`, and plain objects do not render as ordinary text. Expressions can also calculate values before they reach the UI.
+React applies CSS through `className`, and a stylesheet can define reusable rules independently of JSX. CSS custom properties make design decisions such as colors, type sizes, and spacing consistent. Importing CSS from the entry module lets the design system apply across the component tree.
 
 ## What We Built in This Branch
 
-We introduced store metadata, a promotional message, the founding year, and a sale price calculated from an original price and discount rate.
+We applied the existing wood-inspired palette and typography to the store shell, improved responsive page sizing, and styled the promotional eyebrow and discounted price. We removed the unused starter stylesheet.
 
 ## Key Files & Code Snippets
 
 ```jsx
-const originalPrice = 240;
-const discountRate = 0.15;
-const salePrice = originalPrice * (1 - discountRate);
-return <strong>${salePrice.toFixed(2)}</strong>;
+:root {
+	--color-background: #f3efe4;
+	--color-text: #2f4a3a;
+	--color-accent: #b8481a;
+	--space-3: 16px;
+}
+.eyebrow {
+	color: var(--color-accent);
+	text-transform: uppercase;
+}
 ```
 
-Use `{bannerMessage}` for plain dynamic text and `${salePrice.toFixed(2)}` for a formatted currency value. JSX still requires one parent element for the returned markup.
+`src/main.jsx` imports `index.css` once. The component uses `className="store-shell"`; all sizing and colors remain in CSS, where they can be tuned without changing component behavior.
 
 ## DevTools & Debugging Tips (if applicable)
 
-Inspect the rendered text in the Elements panel. Try interpolating a boolean or object to see why those values are not useful as visible JSX text.
+Inspect computed styles in the browser Elements panel and resize the viewport to verify the single-column layout and heading scale.
 
 ## Exercise for Students
 
-Change `discountRate` and display a different sale price without editing the JSX structure.
+Add a design token for a second accent color and apply it to the featured price.
