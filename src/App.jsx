@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer.jsx";
 import Navbar from "./components/Navbar.jsx";
 import HomePage from "./pages/HomePage.jsx";
+import ProductDetails from "./pages/ProductDetails.jsx";
 import ShopPage from "./pages/ShopPage.jsx";
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/shop" element={<ShopPage onAddToCart={addToCart} />} />
+          <Route path="/products/:id" element={<ProductDetails />} />
         </Routes>
       </main>
       <Footer />

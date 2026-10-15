@@ -1,6 +1,15 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
-function ProductCard({ id, title, price, imageUrl, material, inStock, onAddToCart }) {
+function ProductCard({
+  id,
+  title,
+  price,
+  imageUrl,
+  material,
+  inStock,
+  onAddToCart,
+}) {
   const [quantity, setQuantity] = useState(1);
 
   function handleQuickView() {
@@ -22,6 +31,9 @@ function ProductCard({ id, title, price, imageUrl, material, inStock, onAddToCar
         <strong>${price.toFixed(2)}</strong>
       </div>
       <p className="stock-status">{inStock ? "In stock" : "Made to order"}</p>
+      <Link className="text-link" to={`/products/${id}`}>
+        View details
+      </Link>
       <div className="quantity-controls" aria-label={`${title} quantity`}>
         <button
           type="button"
