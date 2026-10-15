@@ -1,32 +1,31 @@
-# Branch 09: JSON Server setup
+# Branch 10: 10-useeffect-and-data-fetching
 
-## Changes from Lesson 08
+## React Concept Covered
 
-Lesson 08 renders its four catalog records from the JavaScript module `src/data/products.js`. This branch adds a local REST API backed by a JSON file, but does not connect the React catalog to it yet. The app continues to use the local module until lesson 10, which isolates API setup from the later fetch implementation.
+Effects synchronize a component with systems outside React, such as a network API. The dependency array controls when the effect runs: `[]` runs after mount, `[value]` reruns when `value` changes, and omitting the array runs after every render. Fetching belongs in an effect rather than during rendering.
 
-## What changed and where
+## What We Built in This Branch
 
-- `data/db.json` adds a `products` collection with sofa, table, chair, and lamp records. The API records include the fields already used by the cards plus `category` and `description` for later lessons.
-- `package.json` adds JSON Server as a development dependency and a `server` script that watches `data/db.json` on port 8000.
-- `package-lock.json` records the dependency installation. `src/components/ProductList.jsx` and `src/data/products.js` are unchanged in behavior on this branch; the displayed products are still imported locally.
+`ProductList` now fetches furniture from JSON Server when it mounts. The static product module is removed, and an abort cleanup prevents a completed request from updating an unmounted component.
 
-## API concepts and setup
+## Key Files & Code Snippets
 
-JSON Server turns the `products` array into REST endpoints: `GET /products` returns the collection, and `GET /products/:id` returns one matching record. Because the server watches `data/db.json`, writes through its API are persisted to that file.
+```jsx
+useEffect(() => {
+  const controller = new AbortController();
+  fetch("http://localhost:8000/products", { signal: controller.signal })
+    .then((response) => response.json())
+    .then(setProducts);
+  return () => controller.abort();
+}, []);
+```
 
-Run `npm run server` and `npm run dev` in separate terminals. The API listens on `http://localhost:8000`; the Vite app uses its own development server.
+Run `npm run server` before opening the app. Check the Network panel for the `/products` request and its JSON response. The empty dependency array means the catalog is requested when the list mounts.
 
-## Check the result
+## DevTools & Debugging Tips (if applicable)
 
-Open `http://localhost:8000/products` and confirm all four records are returned. Then request `http://localhost:8000/products/table-01` to inspect one item. The storefront should still render from `src/data/products.js` in this lesson.
+Try changing the effect dependencies and observe how often the request runs. Keep network work out of the component's render body.
 
-## Exercise
+## Exercise for Students
 
-Add a fifth product to the `products` array in `data/db.json` and confirm the API response includes it. The page will not show it until the data-fetching lesson connects the UI to the API.
-
-## Read on react.dev
-
-This lesson is about a development tool, not React, so react.dev has no matching page. The next lesson uses the API from React. For the tool itself, see the JSON Server project page.
-
-- [JSON Server (not part of React)](https://github.com/typicode/json-server)
-- [Thinking in React, for where data comes from](https://react.dev/learn/thinking-in-react)
+Filter the fetched array before rendering to show only one furniture category.
