@@ -1,31 +1,28 @@
-# Branch 08: Rendering product lists
+# Branch 09: 09-json-server-setup
 
-## Changes from Lesson 07
+## React Concept Covered
 
-Lesson 07 rendered one featured product card. This branch replaces that single card with a catalog of four furniture records. The product details move into a data module, and a new `ProductList` component turns the array into reusable cards. The cart callback still flows down from `App`, and each rendered card keeps its own quantity state.
+An API exposes resources through HTTP endpoints. JSON Server turns a JSON file into a local REST API, allowing the React app to practice requests and persistence without building a backend. A collection named `products` is exposed at `/products` and individual records at `/products/:id`.
 
-## What changed and where
+## What We Built in This Branch
 
-- `src/data/products.js` exports four product objects: sofa, side table, lounge chair, and lamp. Each record has a stable `id`, title, price, image URL, material, and stock flag.
-- `src/components/ProductList.jsx` imports the array, maps each record to a `ProductCard`, sets `key={product.id}`, and forwards `onAddToCart` to each card. It writes the props as `{...product}`, the spread shorthand from lesson 05, because every field of the record is a prop the card accepts.
-- `src/App.jsx` replaces its single `ProductCard` with `ProductList` and passes the existing cart callback into the list.
-- `src/index.css` styles the list as a product grid and adjusts the catalog layout for smaller screens.
+We added seed records for sofas, tables, chairs, and lamps to `data/db.json`, then added a `server` script that serves them on port 8000. The catalog still uses its local module in this checkpoint; the API integration follows in the next branch.
 
-## React concept
+## Key Files & Code Snippets
 
-Use `.map()` to transform data into repeated UI. The `key` belongs on the element returned directly from the map so React can track that product as the list changes. A key is an internal reconciliation hint; it is not automatically passed as a prop. Since each map iteration creates its own `ProductCard`, each card has independent quantity state.
+```jsx
+"scripts": {
+  "dev": "vite",
+  "server": "json-server --watch data/db.json --port 8000"
+}
+```
 
-## Check the result
+Run `npm run server` in one terminal and `npm run dev` in another. Visit `http://localhost:8000/products` to inspect the JSON collection. JSON Server writes changes back to the watched file.
 
-Confirm all four products render and the browser console has no missing-key warning. Change the order of the records in `src/data/products.js` and verify the cards follow that order. Change quantity for one card and confirm it does not change the others.
+## DevTools & Debugging Tips (if applicable)
 
-## Exercise
+Use the browser or an HTTP client to test `GET /products` and `GET /products/table-01`. Stop the server with Ctrl+C when finished.
 
-Add a fifth product object with a unique ID and verify the catalog renders it without adding another card element in JSX.
+## Exercise for Students
 
-## Read on react.dev
-
-These pages cover rendering lists with keys, and the state each card keeps.
-
-- [Rendering lists](https://react.dev/learn/rendering-lists)
-- [Keeping components pure](https://react.dev/learn/keeping-components-pure)
+Add one lamp to `db.json`, restart the server, and verify it appears in the collection response.
