@@ -1,27 +1,30 @@
-# Branch 11: 11-conditional-rendering-and-loading-states
+# Branch 12: 12-react-router-setup
 
 ## React Concept Covered
 
-Conditional rendering lets a component match its UI to its current state. Use a ternary when choosing between two outputs and `condition && element` when an element is optional. Loading, success, and error are distinct states and should be rendered intentionally.
+Client-side routing maps URL paths to React components without asking the server for a new HTML page on every navigation. `BrowserRouter` provides the routing context, `Routes` selects a matching route, and `Link`/`NavLink` update the URL without a full reload. `NavLink` also exposes active state for styling.
 
 ## What We Built in This Branch
 
-The catalog now shows a skeleton while the request is pending and an accessible error banner if the API request fails. `isLoading` and `error` are separate state values alongside the product array.
+We wrapped the app in `BrowserRouter` and added Home (`/`) and Shop (`/shop`) pages. The navbar and hero now use React Router links, so navigation stays within the single-page app.
 
 ## Key Files & Code Snippets
 
 ```jsx
-if (isLoading) return <CatalogSkeleton />;
-if (error) return <p role="alert">Unable to load the furniture catalog.</p>;
-return products.map((product) => <ProductCard key={product.id} {...product} />);
+<BrowserRouter>
+	<Routes>
+		<Route path="/" element={<HomePage />} />
+		<Route path="/shop" element={<ShopPage />} />
+	</Routes>
+</BrowserRouter>
 ```
 
-Throttle the Network panel to observe the loading state. Stop JSON Server to confirm the error banner appears and that it is announced by assistive technology through `role="alert"`.
+Click between Home and Shop and watch the address bar. The document should not reload. Inspect the active class applied by `NavLink` on the current route.
 
 ## DevTools & Debugging Tips (if applicable)
 
-Use `&&` for a brief optional status label and a ternary when the UI must choose between two equally meaningful states.
+Use ordinary anchors for external destinations and React Router links for internal destinations.
 
 ## Exercise for Students
 
-Add a retry button that starts the request again after a failure.
+Add an About route and navigation link while preserving the existing shared navbar and footer.
