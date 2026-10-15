@@ -10,16 +10,41 @@ const initialFormData = {
 
 function AddProductPage() {
   const [formData, setFormData] = useState(initialFormData);
-  const [showPreview, setShowPreview] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState("");
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   function handleChange(event) {
     const { name, value } = event.target;
     setFormData((currentFormData) => ({ ...currentFormData, [name]: value }));
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    setShowPreview(true);
+    setIsSubmitting(true);
+    setSubmissionError("");
+    setIsSubmitted(false);
+
+    const product = {
+      ...formData,
+      price: Number(formData.price),
+      inStock: true,
+    };
+
+    try {
+      const response = await fetch("http://localhost:8000/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(product),
+      });
+      if (!response.ok) throw new Error("Could not save this furniture piece");
+      await response.json();
+      setIsSubmitted(true);
+    } catch (error) {
+      setSubmissionError(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -79,13 +104,12 @@ function AddProductPage() {
             required
           />
         </label>
-        <button className="form-submit" type="submit">Preview listing</button>
+        <button className="form-submit" type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Saving..." : "Add product"}
+        </button>
       </form>
-      {showPreview && (
-        <p className="form-feedback" role="status">
-          Draft ready: {formData.title} ({formData.category})
-        </p>
-      )}
+      {isSubmitted && <p className="form-feedback" role="status">Furniture added to the catalog.</p>}
+      {submissionError && <p className="error-banner" role="alert">{submissionError}</p>}
     </section>
   );
 }
