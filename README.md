@@ -4,13 +4,29 @@ This template provides a minimal setup to get React working in Vite with HMR and
 
 Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+# Branch 01: 01-setup-and-app-structure
 
-## React Compiler
+## React Concept Covered
+Vite serves the project during development and bundles it for production. The browser loads `index.html`, whose module script points to `src/main.jsx`. That entry imports the global stylesheet and the root `App` component, then `createRoot` connects React to the `#root` DOM element. JSX lets a component describe the UI with markup-like syntax inside JavaScript.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## What We Built in This Branch
+We removed the starter screen and established the Craft & Oak Furniture identity with a semantic page container, a title, and a short store description. The HTML document now carries the store title and description too.
 
-## Expanding the ESLint configuration
+## Key Files & Code Snippets
+```jsx
+function App() {
+	return (
+		<main className="store-shell">
+			<h1>Craft &amp; Oak Furniture</h1>
+			<p>Furniture made for the shape of everyday life.</p>
+		</main>
+	);
+}
+```
+`src/main.jsx` mounts `<App />` into the element with `id="root"`.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## DevTools & Debugging Tips (if applicable)
+Inspect `#root` in the browser Elements panel and confirm React has rendered the heading. Vite's terminal output reports compile errors and exposes the local development URL.
+
+## Exercise for Students
+Change the supporting sentence and confirm Vite updates the page without a full reload.
