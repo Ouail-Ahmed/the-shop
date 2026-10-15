@@ -345,6 +345,21 @@ a {
   padding-block: var(--space-6);
 }
 
+.not-found-page {
+  min-height: 56svh;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.not-found-page h1 {
+  max-width: 16ch;
+  margin: 0;
+  font-size: 52px;
+}
+
 .product-copy {
   display: flex;
   justify-content: space-between;
@@ -450,6 +465,10 @@ a {
   .product-details {
     grid-template-columns: 1fr;
     gap: var(--space-4);
+  }
+
+  .not-found-page h1 {
+    font-size: 38px;
   }
 
   .product-form {

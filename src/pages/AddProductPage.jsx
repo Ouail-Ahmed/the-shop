@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { API_URL } from "../api.js";
 
 const initialFormData = {
@@ -10,8 +11,9 @@ const initialFormData = {
 };
 
 function AddProductPage() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState(initialFormData);
-  const [status, setStatus] = useState("idle"); // "idle" | "submitting" | "success" | "error"
+  const [status, setStatus] = useState("idle"); // "idle" | "submitting" | "error"
   const [errorMessage, setErrorMessage] = useState(""); // only read when status is "error"
 
   function handleChange(event) {
@@ -36,8 +38,8 @@ function AddProductPage() {
         body: JSON.stringify(product),
       });
       if (!response.ok) throw new Error("Could not save this furniture piece");
-      await response.json();
-      setStatus("success");
+      const createdProduct = await response.json();
+      navigate(`/products/${createdProduct.id}`);
     } catch (error) {
       setErrorMessage(error.message);
       setStatus("error");
@@ -105,7 +107,6 @@ function AddProductPage() {
           {status === "submitting" ? "Saving..." : "Add product"}
         </button>
       </form>
-      {status === "success" && <p className="form-feedback" role="status">Furniture added to the catalog.</p>}
       {status === "error" && <p className="error-banner" role="alert">{errorMessage}</p>}
     </section>
   );
