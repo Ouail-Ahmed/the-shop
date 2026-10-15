@@ -64,7 +64,11 @@ function AddProductPage() {
         </label>
         <label>
           Category
-          <select name="category" value={formData.category} onChange={handleChange}>
+          <select
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+          >
             <option value="sofas">Sofas</option>
             <option value="tables">Tables</option>
             <option value="chairs">Chairs</option>
@@ -103,11 +107,19 @@ function AddProductPage() {
             required
           />
         </label>
-        <button className="form-submit" type="submit" disabled={status === "submitting"}>
+        <button
+          className="form-submit"
+          type="submit"
+          disabled={status === "submitting"}
+        >
           {status === "submitting" ? "Saving..." : "Add product"}
         </button>
       </form>
-      {status === "error" && <p className="error-banner" role="alert">{errorMessage}</p>}
+      {status === "error" && (
+        <p className="error-banner" role="alert">
+          {errorMessage}
+        </p>
+      )}
     </section>
   );
 }

@@ -13,7 +13,7 @@ After a successful product POST, the form navigates to the new product's detail 
 ```jsx
 const createdProduct = await response.json();
 navigate(`/products/${createdProduct.id}`);
-<Route path="*" element={<NotFoundPage />} />
+<Route path="*" element={<NotFoundPage />} />;
 ```
 
 Submit a new item and confirm the URL changes to `/products/:id`. Then open an unknown path and use the 404 page's link to return to the catalog.
