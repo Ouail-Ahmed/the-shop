@@ -31,6 +31,7 @@ function App() {
             <h2>Made for living</h2>
           </div>
           <ProductCard
+            id={featuredProduct.id}
             title={featuredProduct.title}
             price={featuredProduct.price}
             imageUrl={featuredProduct.imageUrl}
