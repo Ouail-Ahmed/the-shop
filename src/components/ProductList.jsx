@@ -42,7 +42,8 @@ function ProductList({ onAddToCart }) {
   if (error) {
     return (
       <p className="error-banner" role="alert">
-        Unable to load the furniture catalog. Start JSON Server with <code>npm run server</code> and try again.
+        Unable to load the furniture catalog. Start JSON Server with{" "}
+        <code>npm run server</code> and try again.
       </p>
     );
   }
