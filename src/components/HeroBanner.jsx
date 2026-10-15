@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function HeroBanner({ message, storeName }) {
   return (
     <section className="hero-banner">
@@ -9,8 +11,12 @@ function HeroBanner({ message, storeName }) {
       <div className="hero-copy">
         <p className="eyebrow">{message}</p>
         <h1>{storeName}, at home.</h1>
-        <p>Considered pieces, honest materials, and room to make them your own.</p>
-        <a className="text-link" href="#collection">Explore the collection</a>
+        <p>
+          Considered pieces, honest materials, and room to make them your own.
+        </p>
+        <Link className="text-link" to="/shop">
+          Explore the collection
+        </Link>
       </div>
     </section>
   );

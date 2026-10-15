@@ -1,16 +1,18 @@
+import { Link, NavLink } from "react-router-dom";
+
 function Navbar({ cartCount }) {
   return (
     <header className="site-header">
-      <a className="wordmark" href="/">
+      <Link className="wordmark" to="/">
         Craft <span>&amp; Oak</span>
-      </a>
+      </Link>
       <nav className="site-nav" aria-label="Main navigation">
-        <a href="#collection">Collection</a>
-        <a href="#about">Our story</a>
+        <NavLink to="/" end>Home</NavLink>
+        <NavLink to="/shop">Shop</NavLink>
       </nav>
-      <a className="header-note" href="#collection">
+      <Link className="header-note" to="/shop">
         Small-batch furniture
-      </a>
+      </Link>
       <span className="cart-count" aria-label={`${cartCount} items in cart`}>
         Cart {cartCount}
       </span>
