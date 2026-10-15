@@ -1,28 +1,27 @@
-# Branch 07: 07-state-and-usestate
+# Branch 08: 08-rendering-lists
 
 ## React Concept Covered
 
-`useState` gives a component a value that survives renders and a setter that requests the next render. A local variable cannot do this. State should be replaced rather than mutated, and functional updates are useful when the next value depends on the previous one.
+Arrays can be transformed into UI with `.map()`. Each sibling rendered from an array needs a stable, unique `key` so React can match items as the list changes. Product IDs are preferable to array indexes because they identify the same record across reorders and updates.
 
 ## What We Built in This Branch
 
-The product card now owns a quantity state with increment and decrement controls. The app owns the cart count and passes its setter through an `onAddToCart` callback, so the navbar reflects items added from the card.
+We moved four furniture records into `src/data/products.js` and added `ProductList`, which maps those records to reusable cards. Each card receives its product data and quantity state remains isolated to that product.
 
 ## Key Files & Code Snippets
 
 ```jsx
-const [quantity, setQuantity] = useState(1);
-setQuantity((currentQuantity) => currentQuantity + 1);
-const [cartCount, setCartCount] = useState(0);
-setCartCount((currentCount) => currentCount + quantity);
+{
+  products.map((product) => <ProductCard key={product.id} {...product} />);
+}
 ```
 
-The quantity state is local to the card, while the cart count belongs to the app because the navbar and card both need it. Both setters use functional updates to avoid relying on stale values.
+The `key` belongs on the element returned directly from `.map()`. It is an internal reconciliation hint and is not automatically passed as a regular prop.
 
 ## DevTools & Debugging Tips (if applicable)
 
-Change quantity and add to cart. Observe the `ProductCard` quantity and `Navbar` cart count in React DevTools; they are separate state values owned by different components.
+Temporarily change product order and confirm the stable IDs keep item state attached to the right furniture record. Check the console for missing-key warnings if a key is removed.
 
 ## Exercise for Students
 
-Add a remove-from-cart button and make sure the counter never falls below zero.
+Add a fifth product record and confirm the catalog renders it without duplicating JSX.
