@@ -1,28 +1,31 @@
-# Branch 09: 09-json-server-setup
+# Branch 10: 10-useeffect-and-data-fetching
 
 ## React Concept Covered
 
-An API exposes resources through HTTP endpoints. JSON Server turns a JSON file into a local REST API, allowing the React app to practice requests and persistence without building a backend. A collection named `products` is exposed at `/products` and individual records at `/products/:id`.
+Effects synchronize a component with systems outside React, such as a network API. The dependency array controls when the effect runs: `[]` runs after mount, `[value]` reruns when `value` changes, and omitting the array runs after every render. Fetching belongs in an effect rather than during rendering.
 
 ## What We Built in This Branch
 
-We added seed records for sofas, tables, chairs, and lamps to `data/db.json`, then added a `server` script that serves them on port 8000. The catalog still uses its local module in this checkpoint; the API integration follows in the next branch.
+`ProductList` now fetches furniture from JSON Server when it mounts. The static product module is removed, and an abort cleanup prevents a completed request from updating an unmounted component.
 
 ## Key Files & Code Snippets
 
 ```jsx
-"scripts": {
-  "dev": "vite",
-  "server": "json-server --watch data/db.json --port 8000"
-}
+useEffect(() => {
+  const controller = new AbortController();
+  fetch("http://localhost:8000/products", { signal: controller.signal })
+    .then((response) => response.json())
+    .then(setProducts);
+  return () => controller.abort();
+}, []);
 ```
 
-Run `npm run server` in one terminal and `npm run dev` in another. Visit `http://localhost:8000/products` to inspect the JSON collection. JSON Server writes changes back to the watched file.
+Run `npm run server` before opening the app. Check the Network panel for the `/products` request and its JSON response. The empty dependency array means the catalog is requested when the list mounts.
 
 ## DevTools & Debugging Tips (if applicable)
 
-Use the browser or an HTTP client to test `GET /products` and `GET /products/table-01`. Stop the server with Ctrl+C when finished.
+Try changing the effect dependencies and observe how often the request runs. Keep network work out of the component's render body.
 
 ## Exercise for Students
 
-Add one lamp to `db.json`, restart the server, and verify it appears in the collection response.
+Filter the fetched array before rendering to show only one furniture category.
