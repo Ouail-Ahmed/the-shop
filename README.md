@@ -1,31 +1,27 @@
-# Branch 10: 10-useeffect-and-data-fetching
+# Branch 11: 11-conditional-rendering-and-loading-states
 
 ## React Concept Covered
 
-Effects synchronize a component with systems outside React, such as a network API. The dependency array controls when the effect runs: `[]` runs after mount, `[value]` reruns when `value` changes, and omitting the array runs after every render. Fetching belongs in an effect rather than during rendering.
+Conditional rendering lets a component match its UI to its current state. Use a ternary when choosing between two outputs and `condition && element` when an element is optional. Loading, success, and error are distinct states and should be rendered intentionally.
 
 ## What We Built in This Branch
 
-`ProductList` now fetches furniture from JSON Server when it mounts. The static product module is removed, and an abort cleanup prevents a completed request from updating an unmounted component.
+The catalog now shows a skeleton while the request is pending and an accessible error banner if the API request fails. `isLoading` and `error` are separate state values alongside the product array.
 
 ## Key Files & Code Snippets
 
 ```jsx
-useEffect(() => {
-  const controller = new AbortController();
-  fetch("http://localhost:8000/products", { signal: controller.signal })
-    .then((response) => response.json())
-    .then(setProducts);
-  return () => controller.abort();
-}, []);
+if (isLoading) return <CatalogSkeleton />;
+if (error) return <p role="alert">Unable to load the furniture catalog.</p>;
+return products.map((product) => <ProductCard key={product.id} {...product} />);
 ```
 
-Run `npm run server` before opening the app. Check the Network panel for the `/products` request and its JSON response. The empty dependency array means the catalog is requested when the list mounts.
+Throttle the Network panel to observe the loading state. Stop JSON Server to confirm the error banner appears and that it is announced by assistive technology through `role="alert"`.
 
 ## DevTools & Debugging Tips (if applicable)
 
-Try changing the effect dependencies and observe how often the request runs. Keep network work out of the component's render body.
+Use `&&` for a brief optional status label and a ternary when the UI must choose between two equally meaningful states.
 
 ## Exercise for Students
 
-Filter the fetched array before rendering to show only one furniture category.
+Add a retry button that starts the request again after a failure.

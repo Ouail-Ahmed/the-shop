@@ -211,6 +211,37 @@ a {
   gap: var(--space-5);
 }
 
+.loading-state {
+  grid-column: 1 / -1;
+}
+
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+  margin-top: var(--space-3);
+}
+
+.skeleton-card {
+  min-height: 320px;
+  background: linear-gradient(110deg, #e7e1d5 8%, #f8f5ee 18%, #e7e1d5 33%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s linear infinite;
+}
+
+@keyframes skeleton-shimmer {
+  to {
+    background-position-x: -200%;
+  }
+}
+
+.error-banner {
+  grid-column: 1 / -1;
+  padding: var(--space-3);
+  border-left: 4px solid var(--accent);
+  background: var(--accent-bg);
+}
+
 .section-heading h2 {
   font-size: 40px;
 }
@@ -321,6 +352,10 @@ a {
   }
 
   .product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .skeleton-grid {
     grid-template-columns: 1fr;
   }
 
