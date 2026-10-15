@@ -105,6 +105,170 @@ body {
   }
 }
 
+a {
+  color: inherit;
+}
+
+.site-frame {
+  width: 100%;
+}
+
+.site-header,
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: 22px;
+  border-bottom: 1px solid var(--border);
+}
+
+.wordmark {
+  font-family: var(--heading);
+  font-size: 22px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.wordmark span {
+  color: var(--accent);
+}
+
+.site-nav {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.site-nav a,
+.header-note {
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+
+.hero-banner {
+  min-height: 440px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  margin-block: var(--space-5);
+  background: #37493b;
+  color: #fff;
+}
+
+.hero-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 58%;
+}
+
+.hero-copy {
+  position: relative;
+  max-width: 540px;
+  padding: var(--space-6);
+}
+
+.hero-copy h1 {
+  margin: var(--space-3) 0;
+  color: #fff;
+  font-size: 64px;
+  line-height: 1.03;
+}
+
+.hero-copy p:not(.eyebrow) {
+  max-width: 42ch;
+}
+
+.hero-copy .eyebrow {
+  color: #f3c7a8;
+}
+
+.text-link {
+  display: inline-block;
+  margin-top: var(--space-4);
+  padding-bottom: 4px;
+  border-bottom: 1px solid currentColor;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.featured-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: var(--space-5);
+  padding-block: var(--space-6);
+}
+
+.section-heading h2 {
+  font-size: 40px;
+}
+
+.product-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.product-copy {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+}
+
+.product-copy h3,
+.product-copy p {
+  margin: 0;
+}
+
+.featured-price {
+  grid-column: 2;
+  margin-top: -48px;
+}
+
+.site-footer {
+  border-top: 1px solid var(--border);
+  border-bottom: 0;
+  font-size: var(--text-sm);
+}
+
+@media (max-width: 700px) {
+  .header-note {
+    display: none;
+  }
+
+  .hero-banner {
+    min-height: 380px;
+  }
+
+  .hero-copy {
+    padding: var(--space-4);
+  }
+
+  .hero-copy h1 {
+    font-size: 44px;
+  }
+
+  .featured-section {
+    grid-template-columns: 1fr;
+  }
+
+  .featured-price {
+    grid-column: 1;
+    margin-top: -28px;
+  }
+
+  .site-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
 h1,
 h2 {
   font-family: var(--heading);

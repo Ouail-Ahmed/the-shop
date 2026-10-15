@@ -1,33 +1,32 @@
-# Branch 03: Design system and styling
+# Branch 04: 04-components-and-reusability
 
-## Changes from Lesson 02
+## React Concept Covered
 
-Lesson 02 established the store copy and dynamic sale-price calculation, but the page still relied on starter-level styling. This branch keeps the JSX behavior and gives the Craft & Oak shell a consistent visual system: a wood-inspired palette, separate heading/body fonts, reusable size and spacing values, and a responsive content width. The Vite starter stylesheet and unused public icons are removed.
+Components are functions that return UI, and a parent can compose them into a component tree. Splitting the page into components gives each part one responsibility and makes it possible to reuse, test, and change that part without rewriting the whole screen. A default export is imported without braces.
 
-## What changed and where
+## What We Built in This Branch
 
-- `src/index.css` defines CSS custom properties for colors, fonts, text sizes, spacing, radii, and shadows. The global font and page colors use those tokens.
-- The same stylesheet styles `#root` as a centered, width-constrained page, `.store-shell` as the main content region, `.eyebrow` as the promotional label, and the sale `<strong>` with the accent color.
-- A media query narrows page gutters and reduces the shell height and heading size on small screens. The heading and paragraph rules establish the typography and spacing used by the current page.
-- `src/main.jsx` already imports `src/index.css`, so these global rules apply without changing the React mount.
-- `index.html` removes the Vite favicon link while retaining the Craft & Oak title, description, theme color, root element, and module entry.
-- `src/App.css`, `public/favicon.svg`, and `public/icons.svg` are removed because the lesson uses the global design stylesheet and no longer needs the starter assets.
+We divided the storefront into `Navbar`, `HeroBanner`, `ProductCard`, and `Footer`. `App` now acts as the page composer, while each child owns its markup.
 
-## React and CSS concepts
+## Key Files & Code Snippets
 
-React connects an element to a stylesheet through `className`; here `src/App.jsx` uses `store-shell` and `eyebrow`, while `src/index.css` owns their presentation. CSS custom properties centralize decisions, so changing a token updates every rule that uses it without changing component behavior.
+```jsx
+import Navbar from './components/Navbar.jsx';
+import HeroBanner from './components/HeroBanner.jsx';
+import ProductCard from './components/ProductCard.jsx';
+import Footer from './components/Footer.jsx';
 
-## Check the result
+function App() {
+  return <><Navbar /><HeroBanner /><ProductCard /><Footer /></>;
+}
+```
 
-Resize the page below and above 600px and inspect the computed width, heading size, and promotional label color. Confirm `src/main.jsx` imports `index.css` and that the page still renders the same values from lesson 02.
+Each component is a separate module under `src/components/` and uses a default export. `App.jsx` imports those modules and arranges them in document order.
 
-## Exercise
+## DevTools & Debugging Tips (if applicable)
 
-Add a second accent-color token in `src/index.css` and use it for the featured sale price.
+Use React DevTools to inspect the component tree and confirm the page is composed from four children. Check that each module's default export name matches its import.
 
-## Read on react.dev
+## Exercise for Students
 
-This lesson is mostly CSS, which is not part of React. The React page below explains why JSX uses `className`. For custom properties, see MDN.
-
-- [Writing markup with JSX](https://react.dev/learn/writing-markup-with-jsx)
-- [MDN: Using CSS custom properties (not react.dev)](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties)
+Create a reusable `ButtonLink` component and replace one of the current text links with it.
