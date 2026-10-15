@@ -259,6 +259,35 @@ a {
   object-fit: cover;
 }
 
+.product-details {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: center;
+  gap: var(--space-6);
+  padding-block: var(--space-6);
+}
+
+.product-details img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.product-details h1 {
+  font-size: 44px;
+}
+
+.detail-price {
+  margin-top: var(--space-4);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.page-status {
+  padding-block: var(--space-6);
+}
+
 .product-copy {
   display: flex;
   justify-content: space-between;
@@ -359,6 +388,11 @@ a {
 
   .product-grid {
     grid-template-columns: 1fr;
+  }
+
+  .product-details {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
   }
 
   .skeleton-grid {

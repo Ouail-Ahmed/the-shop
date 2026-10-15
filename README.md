@@ -1,34 +1,30 @@
-# Branch 12: React Router and page routes
+# Branch 13: 13-route-parameters
 
-## Changes from Lesson 11
+## React Concept Covered
 
-Lesson 11 rendered the hero and catalog together on one page. This branch gives them separate URLs and page components: Home at `/` and Shop at `/shop`. It adds React Router and changes internal navigation from page/section anchors to client-side route links. The shared navbar, footer, and cart state remain outside the route switch.
+Route parameters let one route pattern represent many records. In `/products/:id`, the colon marks a dynamic segment; `useParams` reads its value from the current URL. The component can use that parameter to request the matching API resource.
 
-## What changed and where
+## What We Built in This Branch
 
-- `src/main.jsx` wraps `<App />` in `BrowserRouter`, providing router context for the app.
-- `src/App.jsx` keeps the cart count and add-to-cart callback, renders `Navbar` and `Footer` around `Routes`, and declares the `/` and `/shop` route elements.
-- `src/pages/HomePage.jsx` contains the home route's `HeroBanner`. `src/pages/ShopPage.jsx` contains the store heading and `ProductList`, receiving the cart callback from `App`.
-- `src/components/Navbar.jsx` replaces internal anchors with a home `Link`, active-aware `NavLink`s for Home and Shop, and a Shop link. `src/components/HeroBanner.jsx` links its collection action to `/shop`.
-- `package.json` adds `react-router-dom` version 7 (`^7.18.4`), and `package-lock.json` records it. Run `npm install` after switching to this branch; `src/index.css` adds the route-navigation and active-link styling.
+We added `/products/:id` and a `ProductDetails` page. Each catalog card links to its detail URL, and the page fetches the matching product record using the route ID.
 
-## React Router concept
+## Key Files & Code Snippets
 
-React Router is a separate library, not part of React itself, so react.dev does not teach it. Its documentation lives at reactrouter.com.
+```jsx
+const { id } = useParams();
+useEffect(() => {
+  fetch(`http://localhost:8000/products/${id}`)
+    .then((response) => response.json())
+    .then(setProduct);
+}, [id]);
+```
 
-`BrowserRouter` listens to browser history, `Routes` selects the matching `Route`, and `Link`/`NavLink` update the URL without a full document request. `NavLink` can expose which route is active. Keeping `Navbar`, `Footer`, and cart state around `Routes` means they persist when the route-specific page changes.
+Click a product and compare its ID in the URL with the request path in the Network panel. Try an unknown ID to see the not-found response handled by the page.
 
-## Check the result
+## DevTools & Debugging Tips (if applicable)
 
-Click Home, Shop, and the hero's collection link. Confirm the address bar changes to `/` or `/shop` without reloading the document, and verify the active navbar link changes. Add an item in Shop, navigate Home, and return to Shop to see that the cart count is still present.
+The effect depends on `id`, so navigating between two product URLs triggers a request for the new record.
 
-## Exercise
+## Exercise for Students
 
-Add an About page route and navigation link while keeping the shared navbar and footer outside `Routes`.
-
-## Read on react.dev
-
-Routing is not part of React itself, so react.dev has no routing lesson. Use the React Router site for this lesson. The react.dev page below covers the idea of separate pages sharing the same state.
-
-- [React Router (not part of React)](https://reactrouter.com/)
-- [Sharing state between components](https://react.dev/learn/sharing-state-between-components)
+Add a related-products link to the detail page using another product ID.
