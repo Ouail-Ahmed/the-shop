@@ -7,8 +7,11 @@ function Navbar({ cartCount }) {
         Craft <span>&amp; Oak</span>
       </Link>
       <nav className="site-nav" aria-label="Main navigation">
-        <NavLink to="/" end>Home</NavLink>
+        <NavLink to="/" end>
+          Home
+        </NavLink>
         <NavLink to="/shop">Shop</NavLink>
+        <NavLink to="/add-product">Add product</NavLink>
       </nav>
       <Link className="header-note" to="/shop">
         Small-batch furniture

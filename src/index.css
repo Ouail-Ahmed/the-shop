@@ -284,6 +284,63 @@ a {
   font-weight: 700;
 }
 
+.add-product-page {
+  padding-block: var(--space-6);
+}
+
+.product-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  max-width: 760px;
+  margin-top: var(--space-5);
+}
+
+.product-form label {
+  display: grid;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.product-form input,
+.product-form select,
+.product-form textarea {
+  width: 100%;
+  min-height: 46px;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  background: #fff;
+  font: inherit;
+}
+
+.product-form textarea {
+  resize: vertical;
+}
+
+.form-wide {
+  grid-column: 1 / -1;
+}
+
+.form-submit {
+  min-height: 46px;
+  padding-inline: var(--space-4);
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: var(--color-on-accent);
+  background: var(--accent);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.form-feedback {
+  margin-top: var(--space-3);
+}
+
 .page-status {
   padding-block: var(--space-6);
 }
@@ -393,6 +450,14 @@ a {
   .product-details {
     grid-template-columns: 1fr;
     gap: var(--space-4);
+  }
+
+  .product-form {
+    grid-template-columns: 1fr;
+  }
+
+  .form-wide {
+    grid-column: 1;
   }
 
   .skeleton-grid {

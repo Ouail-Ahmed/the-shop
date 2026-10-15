@@ -1,30 +1,29 @@
-# Branch 13: 13-route-parameters
+# Branch 14: 14-controlled-inputs-and-forms
 
 ## React Concept Covered
 
-Route parameters let one route pattern represent many records. In `/products/:id`, the colon marks a dynamic segment; `useParams` reads its value from the current URL. The component can use that parameter to request the matching API resource.
+In a controlled input, React state is the source of truth: the element receives a `value`, and `onChange` updates that state. This keeps the displayed form value synchronized with application data and makes validation or previews straightforward.
 
 ## What We Built in This Branch
 
-We added `/products/:id` and a `ProductDetails` page. Each catalog card links to its detail URL, and the page fetches the matching product record using the route ID.
+We added `/add-product` with controlled fields for title, category, price, description, and image URL. The form reads and updates one state object, then previews the draft without sending it to the API yet.
 
 ## Key Files & Code Snippets
 
 ```jsx
-const { id } = useParams();
-useEffect(() => {
-  fetch(`http://localhost:8000/products/${id}`)
-    .then((response) => response.json())
-    .then(setProduct);
-}, [id]);
+<input name="title" value={formData.title} onChange={handleChange} />
+function handleChange(event) {
+  const { name, value } = event.target;
+  setFormData((current) => ({ ...current, [name]: value }));
+}
 ```
 
-Click a product and compare its ID in the URL with the request path in the Network panel. Try an unknown ID to see the not-found response handled by the page.
+Type in each field and inspect React DevTools to see `formData` update. Confirm number, URL, and required constraints with the browser's built-in validation.
 
 ## DevTools & Debugging Tips (if applicable)
 
-The effect depends on `id`, so navigating between two product URLs triggers a request for the new record.
+The `name` attribute lets one change handler update any field. The spread copies the previous object so changing one field preserves the rest.
 
 ## Exercise for Students
 
-Add a related-products link to the detail page using another product ID.
+Add a `material` field and show it in the draft preview.
