@@ -1,16 +1,34 @@
-# React + Vite
+# Branch 03: 03-design-system-and-styling
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## React Concept Covered
 
-Currently, two official plugins are available:
+React applies CSS through `className`, and a stylesheet can define reusable rules independently of JSX. CSS custom properties make design decisions such as colors, type sizes, and spacing consistent. Importing CSS from the entry module lets the design system apply across the component tree.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## What We Built in This Branch
 
-## React Compiler
+We applied the existing wood-inspired palette and typography to the store shell, improved responsive page sizing, and styled the promotional eyebrow and discounted price. We removed the unused starter stylesheet.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Key Files & Code Snippets
 
-## Expanding the ESLint configuration
+```jsx
+:root {
+	--color-background: #f3efe4;
+	--color-text: #2f4a3a;
+	--color-accent: #b8481a;
+	--space-3: 16px;
+}
+.eyebrow {
+	color: var(--color-accent);
+	text-transform: uppercase;
+}
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+`src/main.jsx` imports `index.css` once. The component uses `className="store-shell"`; all sizing and colors remain in CSS, where they can be tuned without changing component behavior.
+
+## DevTools & Debugging Tips (if applicable)
+
+Inspect computed styles in the browser Elements panel and resize the viewport to verify the single-column layout and heading scale.
+
+## Exercise for Students
+
+Add a design token for a second accent color and apply it to the featured price.
