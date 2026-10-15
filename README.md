@@ -1,30 +1,34 @@
-# Branch 02: Dynamic values and JSX
+# Branch 03: 03-design-system-and-styling
 
-## Changes from Lesson 01
+## React Concept Covered
 
-Lesson 01 hard-coded the store heading and a static supporting sentence in `src/App.jsx`. This lesson moves the repeated store details and promotional content into local JavaScript constants, then inserts those values into JSX. It also replaces a static price with a price calculated from the original amount and a discount rate. The component and document structure remain otherwise unchanged.
+React applies CSS through `className`, and a stylesheet can define reusable rules independently of JSX. CSS custom properties make design decisions such as colors, type sizes, and spacing consistent. Importing CSS from the entry module lets the design system apply across the component tree.
 
-## What changed and where
+## What We Built in This Branch
 
-- `src/App.jsx` defines `storeName`, `establishedYear`, and `bannerMessage`, then renders them inside the heading, promotional eyebrow, and store-history sentence.
-- The same component defines `originalPrice` and `discountRate`, calculates `salePrice`, and displays the original amount in `<del>` beside the sale amount in `<strong>`.
-- Currency output uses `toFixed(2)` so both values display two decimal places. No new component or stylesheet is added in this lesson.
+We applied the existing wood-inspired palette and typography to the store shell, improved responsive page sizing, and styled the promotional eyebrow and discounted price. We removed the unused starter stylesheet.
 
-## React concept
+## Key Files & Code Snippets
 
-Curly braces in JSX evaluate JavaScript expressions. They can read a variable such as `{bannerMessage}` or render a calculation such as `{salePrice.toFixed(2)}`. Keep the dollar sign outside the expression as JSX text. Strings and numbers render as text; booleans, `null`, and plain objects do not render as ordinary text.
+```jsx
+:root {
+	--color-background: #f3efe4;
+	--color-text: #2f4a3a;
+	--color-accent: #b8481a;
+	--space-3: 16px;
+}
+.eyebrow {
+	color: var(--color-accent);
+	text-transform: uppercase;
+}
+```
 
-## Check the result
+`src/main.jsx` imports `index.css` once. The component uses `className="store-shell"`; all sizing and colors remain in CSS, where they can be tuned without changing component behavior.
 
-Inspect the rendered page and confirm that the founding year and banner match their constants. Change `discountRate` in `src/App.jsx`; the sale price should change while the JSX structure stays the same.
+## DevTools & Debugging Tips (if applicable)
 
-## Exercise
+Inspect computed styles in the browser Elements panel and resize the viewport to verify the single-column layout and heading scale.
 
-Add a `currencyCode` constant and display it next to both the original and sale prices.
+## Exercise for Students
 
-## Read on react.dev
-
-These pages cover the ideas in this lesson.
-
-- [JavaScript in JSX with curly braces](https://react.dev/learn/javascript-in-jsx-with-curly-braces)
-- [Writing markup with JSX](https://react.dev/learn/writing-markup-with-jsx)
+Add a design token for a second accent color and apply it to the featured price.
