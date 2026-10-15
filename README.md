@@ -1,30 +1,28 @@
-# Branch 06: Click events and DevTools
+# Branch 07: 07-state-and-usestate
 
-## Changes from Lesson 05
+## React Concept Covered
 
-Lesson 05 made the card's product values arrive as props. This branch also passes the product `id` from `App` into `ProductCard` and adds two buttons beneath the stock status. The buttons demonstrate React click events, but they do not yet open a product view or save a wishlist item: both actions currently log the selected ID to the browser console.
+`useState` gives a component a value that survives renders and a setter that requests the next render. A local variable cannot do this. State should be replaced rather than mutated, and functional updates are useful when the next value depends on the previous one.
 
-## What changed and where
+## What We Built in This Branch
 
-- `src/App.jsx` adds `id={featuredProduct.id}` to the explicit props it passes to `ProductCard`.
-- `src/components/ProductCard.jsx` now destructures `id`, defines `handleQuickView` and `handleWishlist`, and attaches them to the new buttons with `onClick`.
-- Quick View passes the function itself as `onClick={handleQuickView}` because it needs no arguments. Wishlist wraps the call, `onClick={() => handleWishlist(id)}`, because the handler needs an argument. The mistake to avoid is `onClick={handleQuickView()}`: the parentheses call the function while the card renders, not when the user clicks. A short comment in `ProductCard.jsx` explains all three forms.
-- `src/index.css` adds styling for the `.product-actions` button group and its hover state.
+The product card now owns a quantity state with increment and decrement controls. The app owns the cart count and passes its setter through an `onAddToCart` callback, so the navbar reflects items added from the card.
 
-## React concept
+## Key Files & Code Snippets
 
-React event props receive functions; do not call a handler while rendering. Here both handlers close over the `id` prop, so they can identify which card was clicked without manually registering DOM listeners.
+```jsx
+const [quantity, setQuantity] = useState(1);
+setQuantity((currentQuantity) => currentQuantity + 1);
+const [cartCount, setCartCount] = useState(0);
+setCartCount((currentCount) => currentCount + quantity);
+```
 
-## Check the result
+The quantity state is local to the card, while the cart count belongs to the app because the navbar and card both need it. Both setters use functional updates to avoid relying on stale values.
 
-Open the browser console and click both actions. Each should log the card's product ID with a different label. In React DevTools, confirm that the `id` prop matches the product shown by the card.
+## DevTools & Debugging Tips (if applicable)
 
-## Exercise
+Change quantity and add to cart. Observe the `ProductCard` quantity and `Navbar` cart count in React DevTools; they are separate state values owned by different components.
 
-Replace the Quick View console message with a dialog that displays the product title, and close the dialog when its close button is clicked.
+## Exercise for Students
 
-## Read on react.dev
-
-These pages cover event handlers, the idea in this lesson.
-
-- [Responding to events](https://react.dev/learn/responding-to-events)
+Add a remove-from-cart button and make sure the counter never falls below zero.
