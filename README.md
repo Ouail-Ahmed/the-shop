@@ -1,30 +1,27 @@
-# Branch 15: 15-submit-event-and-post-request
+# Branch 16: 16-redirects-and-404-page
 
 ## React Concept Covered
 
-The browser's default form submission navigates away and reloads the page. Calling `event.preventDefault()` keeps the SPA in control. A JSON `POST` request declares its content type and serializes the payload with `JSON.stringify` before sending it to the API.
+`useNavigate` changes the current route from code after an action succeeds. A wildcard route (`path="*"`) catches URLs that do not match another route, giving users a useful recovery path instead of a blank screen.
 
 ## What We Built in This Branch
 
-Submitting `/add-product` now sends the controlled values to `POST /products`. The payload converts the price to a number, and the page reports pending, success, or failure feedback.
+After a successful product POST, the form navigates to the new product's detail route using the ID returned by the API. A custom wildcard page handles unknown paths and links back to the collection.
 
 ## Key Files & Code Snippets
 
 ```jsx
-event.preventDefault();
-await fetch("http://localhost:8000/products", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ ...formData, price: Number(formData.price) }),
-});
+const createdProduct = await response.json();
+navigate(`/products/${createdProduct.id}`);
+<Route path="*" element={<NotFoundPage />} />
 ```
 
-Watch the Network panel for the POST method, JSON request body, and created product response. Refresh `GET /products` and confirm the record persisted in `data/db.json`.
+Submit a new item and confirm the URL changes to `/products/:id`. Then open an unknown path and use the 404 page's link to return to the catalog.
 
 ## DevTools & Debugging Tips (if applicable)
 
-The server treats this mock write as persistence by updating the JSON file. The client must check `response.ok`; a resolved fetch promise does not guarantee a successful HTTP status.
+Only navigate after checking `response.ok` and parsing the successful response; otherwise keep the form visible and show the submission error.
 
 ## Exercise for Students
 
-Show the created product ID in the success feedback, then use it to build a detail-page link.
+Add a not-found state for an unknown product ID that offers a route back to `/shop`.

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const initialFormData = {
   title: "",
@@ -9,10 +10,10 @@ const initialFormData = {
 };
 
 function AddProductPage() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
-  const [isSubmitted, setIsSubmitted] = useState(false);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -23,7 +24,6 @@ function AddProductPage() {
     event.preventDefault();
     setIsSubmitting(true);
     setSubmissionError("");
-    setIsSubmitted(false);
 
     const product = {
       ...formData,
@@ -38,8 +38,8 @@ function AddProductPage() {
         body: JSON.stringify(product),
       });
       if (!response.ok) throw new Error("Could not save this furniture piece");
-      await response.json();
-      setIsSubmitted(true);
+      const createdProduct = await response.json();
+      navigate(`/products/${createdProduct.id}`);
     } catch (error) {
       setSubmissionError(error.message);
     } finally {
@@ -108,7 +108,6 @@ function AddProductPage() {
           {isSubmitting ? "Saving..." : "Add product"}
         </button>
       </form>
-      {isSubmitted && <p className="form-feedback" role="status">Furniture added to the catalog.</p>}
       {submissionError && <p className="error-banner" role="alert">{submissionError}</p>}
     </section>
   );
