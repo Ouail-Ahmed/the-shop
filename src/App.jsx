@@ -1,9 +1,11 @@
+import { useState } from "react";
 import Footer from "./components/Footer.jsx";
 import HeroBanner from "./components/HeroBanner.jsx";
 import Navbar from "./components/Navbar.jsx";
 import ProductCard from "./components/ProductCard.jsx";
 
 function App() {
+  const [cartCount, setCartCount] = useState(0);
   const storeName = "Craft & Oak";
   const establishedYear = 2018;
   const bannerMessage = "Thoughtful furniture, made to last.";
@@ -11,18 +13,21 @@ function App() {
   const discountRate = 0.15;
   const salePrice = originalPrice * (1 - discountRate);
   const featuredProduct = {
-    id: 'rowan-side-table',
-    title: 'Rowan Side Table',
+    id: "rowan-side-table",
+    title: "Rowan Side Table",
     price: originalPrice,
     imageUrl:
-      'https://images.unsplash.com/photo-1598300053653-0f3f8a5c5f4b?auto=format&fit=crop&w=1000&q=85',
-    material: 'Solid oak',
+      "https://images.unsplash.com/photo-1598300053653-0f3f8a5c5f4b?auto=format&fit=crop&w=1000&q=85",
+    material: "Solid oak",
     inStock: true,
+  };
+  const addToCart = (quantity) => {
+    setCartCount((currentCount) => currentCount + quantity);
   };
 
   return (
     <div className="site-frame">
-      <Navbar />
+      <Navbar cartCount={cartCount} />
       <main>
         <HeroBanner message={bannerMessage} storeName={storeName} />
         <section className="featured-section" id="collection">
@@ -30,7 +35,7 @@ function App() {
             <p className="eyebrow">Since {establishedYear}</p>
             <h2>Made for living</h2>
           </div>
-          <ProductCard {...featuredProduct} />
+          <ProductCard {...featuredProduct} onAddToCart={addToCart} />
           <p className="featured-price">
             Featured table: <del>${originalPrice.toFixed(2)}</del>{" "}
             <strong>${salePrice.toFixed(2)}</strong>

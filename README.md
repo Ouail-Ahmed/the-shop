@@ -1,29 +1,28 @@
-# Branch 06: 06-click-events-and-dev-tools
+# Branch 07: 07-state-and-usestate
 
 ## React Concept Covered
 
-React event props such as `onClick` receive a function. Pass the function itself when no arguments are needed; use a callback such as `onClick={() => handle(id)}` when values must be supplied. React's event system delivers browser interactions to these handlers without manually wiring DOM listeners.
+`useState` gives a component a value that survives renders and a setter that requests the next render. A local variable cannot do this. State should be replaced rather than mutated, and functional updates are useful when the next value depends on the previous one.
 
 ## What We Built in This Branch
 
-The featured product card now has Quick View and Add to Wishlist buttons. Their handlers log the product ID, making it easy to verify which item each interaction targets.
+The product card now owns a quantity state with increment and decrement controls. The app owns the cart count and passes its setter through an `onAddToCart` callback, so the navbar reflects items added from the card.
 
 ## Key Files & Code Snippets
 
 ```jsx
-function handleQuickView() {
-  console.log('Quick view product:', id);
-}
-<button type="button" onClick={handleQuickView}>Quick View</button>
-<button type="button" onClick={() => handleWishlist()}>Add to Wishlist</button>
+const [quantity, setQuantity] = useState(1);
+setQuantity((currentQuantity) => currentQuantity + 1);
+const [cartCount, setCartCount] = useState(0);
+setCartCount((currentCount) => currentCount + quantity);
 ```
 
-The direct handler reference is enough for `handleQuickView`; the callback form is useful when arguments are needed. Both handlers close over the `id` prop.
+The quantity state is local to the card, while the cart count belongs to the app because the navbar and card both need it. Both setters use functional updates to avoid relying on stale values.
 
 ## DevTools & Debugging Tips (if applicable)
 
-Open the browser console, click each button, then inspect `ProductCard` props in React DevTools to compare the logged ID with the rendered item.
+Change quantity and add to cart. Observe the `ProductCard` quantity and `Navbar` cart count in React DevTools; they are separate state values owned by different components.
 
 ## Exercise for Students
 
-Change the Quick View handler to open a small dialog that displays the product title.
+Add a remove-from-cart button and make sure the counter never falls below zero.

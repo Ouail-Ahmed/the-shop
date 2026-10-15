@@ -1,4 +1,4 @@
-function Navbar() {
+function Navbar({ cartCount }) {
   return (
     <header className="site-header">
       <a className="wordmark" href="/">
@@ -8,7 +8,12 @@ function Navbar() {
         <a href="#collection">Collection</a>
         <a href="#about">Our story</a>
       </nav>
-      <a className="header-note" href="#collection">Small-batch furniture</a>
+      <a className="header-note" href="#collection">
+        Small-batch furniture
+      </a>
+      <span className="cart-count" aria-label={`${cartCount} items in cart`}>
+        Cart {cartCount}
+      </span>
     </header>
   );
 }
