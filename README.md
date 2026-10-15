@@ -1,32 +1,30 @@
-# Branch 14: Controlled inputs and forms
+# Branch 15: 15-submit-event-and-post-request
 
-## Changes from Lesson 13
+## React Concept Covered
 
-Lesson 13 let shoppers read product details but had no way to enter a new product. This branch adds an `/add-product` route and a form with controlled fields for a product name, category, price, image URL, and description. Submitting the form only reports that a draft is ready; it does not send or save the product yet. The API submission is added in lesson 15.
+The browser's default form submission navigates away and reloads the page. Calling `event.preventDefault()` keeps the SPA in control. A JSON `POST` request declares its content type and serializes the payload with `JSON.stringify` before sending it to the API.
 
-## What changed and where
+## What We Built in This Branch
 
-- `src/App.jsx` imports `AddProductPage` and registers the `/add-product` route.
-- `src/components/Navbar.jsx` adds an active-aware Add product link to the shared navigation.
-- `src/pages/AddProductPage.jsx` defines the initial form values and stores all fields in one `formData` state object. `handleChange` uses each control's `name` to update only that field while preserving the others.
-- The category `<select>` offers sofas, tables, chairs, and lamps. The title, price, image URL, and description controls use required constraints; price uses number/min/step attributes and the image field uses `type="url"`.
-- The submit handler prevents the browser's default navigation and reveals a status message with the draft title and category. `src/index.css` styles the form, wide description field, and feedback.
+Submitting `/add-product` now sends the controlled values to `POST /products`. The payload converts the price to a number, and the page reports pending, success, or failure feedback.
 
-## React concept
+## Key Files & Code Snippets
 
-A controlled input takes its displayed `value` from React state, and its `onChange` handler updates that state. The `name` attribute lets one change handler serve every field. Copying the current object with a spread avoids mutating state or erasing values in other fields.
+```jsx
+event.preventDefault();
+await fetch("http://localhost:8000/products", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ ...formData, price: Number(formData.price) }),
+});
+```
 
-## Check the result
+Watch the Network panel for the POST method, JSON request body, and created product response. Refresh `GET /products` and confirm the record persisted in `data/db.json`.
 
-Open `/add-product`, enter values, and inspect `formData` in React DevTools as you type. Submit an incomplete form and observe native validation; complete it and confirm the "Draft ready" status appears. No network POST should occur in this lesson.
+## DevTools & Debugging Tips (if applicable)
 
-## Exercise
+The server treats this mock write as persistence by updating the JSON file. The client must check `response.ok`; a resolved fetch promise does not guarantee a successful HTTP status.
 
-Add a controlled `material` field and include it in the draft feedback or preview.
+## Exercise for Students
 
-## Read on react.dev
-
-These pages cover forms driven by state.
-
-- [Reacting to input with state](https://react.dev/learn/reacting-to-input-with-state)
-- [Updating objects in state](https://react.dev/learn/updating-objects-in-state)
+Show the created product ID in the success feedback, then use it to build a detail-page link.

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { API_URL } from "../api.js";
 
 const initialFormData = {
   title: "",
@@ -10,16 +11,37 @@ const initialFormData = {
 
 function AddProductPage() {
   const [formData, setFormData] = useState(initialFormData);
-  const [showPreview, setShowPreview] = useState(false);
+  const [status, setStatus] = useState("idle"); // "idle" | "submitting" | "success" | "error"
+  const [errorMessage, setErrorMessage] = useState(""); // only read when status is "error"
 
   function handleChange(event) {
     const { name, value } = event.target;
     setFormData((currentFormData) => ({ ...currentFormData, [name]: value }));
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    setShowPreview(true);
+    setStatus("submitting");
+
+    const product = {
+      ...formData,
+      price: Number(formData.price),
+      inStock: true,
+    };
+
+    try {
+      const response = await fetch(`${API_URL}/products`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(product),
+      });
+      if (!response.ok) throw new Error("Could not save this furniture piece");
+      await response.json();
+      setStatus("success");
+    } catch (error) {
+      setErrorMessage(error.message);
+      setStatus("error");
+    }
   }
 
   return (
@@ -79,13 +101,12 @@ function AddProductPage() {
             required
           />
         </label>
-        <button className="form-submit" type="submit">Preview listing</button>
+        <button className="form-submit" type="submit" disabled={status === "submitting"}>
+          {status === "submitting" ? "Saving..." : "Add product"}
+        </button>
       </form>
-      {showPreview && (
-        <p className="form-feedback" role="status">
-          Draft ready: {formData.title} ({formData.category})
-        </p>
-      )}
+      {status === "success" && <p className="form-feedback" role="status">Furniture added to the catalog.</p>}
+      {status === "error" && <p className="error-banner" role="alert">{errorMessage}</p>}
     </section>
   );
 }
