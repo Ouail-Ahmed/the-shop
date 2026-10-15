@@ -1,34 +1,32 @@
-# Branch 03: 03-design-system-and-styling
+# Branch 04: 04-components-and-reusability
 
 ## React Concept Covered
 
-React applies CSS through `className`, and a stylesheet can define reusable rules independently of JSX. CSS custom properties make design decisions such as colors, type sizes, and spacing consistent. Importing CSS from the entry module lets the design system apply across the component tree.
+Components are functions that return UI, and a parent can compose them into a component tree. Splitting the page into components gives each part one responsibility and makes it possible to reuse, test, and change that part without rewriting the whole screen. A default export is imported without braces.
 
 ## What We Built in This Branch
 
-We applied the existing wood-inspired palette and typography to the store shell, improved responsive page sizing, and styled the promotional eyebrow and discounted price. We removed the unused starter stylesheet.
+We divided the storefront into `Navbar`, `HeroBanner`, `ProductCard`, and `Footer`. `App` now acts as the page composer, while each child owns its markup.
 
 ## Key Files & Code Snippets
 
 ```jsx
-:root {
-	--color-background: #f3efe4;
-	--color-text: #2f4a3a;
-	--color-accent: #b8481a;
-	--space-3: 16px;
-}
-.eyebrow {
-	color: var(--color-accent);
-	text-transform: uppercase;
+import Navbar from './components/Navbar.jsx';
+import HeroBanner from './components/HeroBanner.jsx';
+import ProductCard from './components/ProductCard.jsx';
+import Footer from './components/Footer.jsx';
+
+function App() {
+  return <><Navbar /><HeroBanner /><ProductCard /><Footer /></>;
 }
 ```
 
-`src/main.jsx` imports `index.css` once. The component uses `className="store-shell"`; all sizing and colors remain in CSS, where they can be tuned without changing component behavior.
+Each component is a separate module under `src/components/` and uses a default export. `App.jsx` imports those modules and arranges them in document order.
 
 ## DevTools & Debugging Tips (if applicable)
 
-Inspect computed styles in the browser Elements panel and resize the viewport to verify the single-column layout and heading scale.
+Use React DevTools to inspect the component tree and confirm the page is composed from four children. Check that each module's default export name matches its import.
 
 ## Exercise for Students
 
-Add a design token for a second accent color and apply it to the featured price.
+Create a reusable `ButtonLink` component and replace one of the current text links with it.
