@@ -1,18 +1,15 @@
-function ProductCard() {
+function ProductCard({ title, price, imageUrl, material, inStock }) {
   return (
     <article>
-      <img
-        className="product-image"
-        src="https://images.unsplash.com/photo-1598300053653-0f3f8a5c5f4b?auto=format&fit=crop&w=1000&q=85"
-        alt="Solid oak side table beside a lounge chair"
-      />
+      <img className="product-image" src={imageUrl} alt={title} />
       <div className="product-copy">
         <div>
-          <h3>Rowan Side Table</h3>
-          <p>Solid oak · made in Vermont</p>
+          <h3>{title}</h3>
+          <p>{material} · made in Vermont</p>
         </div>
-        <strong>$240</strong>
+        <strong>${price.toFixed(2)}</strong>
       </div>
+      <p className="stock-status">{inStock ? 'In stock' : 'Made to order'}</p>
     </article>
   );
 }
