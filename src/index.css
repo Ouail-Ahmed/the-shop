@@ -202,11 +202,13 @@ a {
 }
 
 .featured-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  gap: var(--space-5);
   padding-block: var(--space-6);
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
 }
 
 .section-heading h2 {
@@ -318,13 +320,8 @@ a {
     font-size: 44px;
   }
 
-  .featured-section {
+  .product-grid {
     grid-template-columns: 1fr;
-  }
-
-  .featured-price {
-    grid-column: 1;
-    margin-top: -28px;
   }
 
   .site-footer {
