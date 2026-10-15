@@ -1,32 +1,39 @@
-# Branch 04: 04-components-and-reusability
+# Branch 05: 05-props-and-customization
 
 ## React Concept Covered
 
-Components are functions that return UI, and a parent can compose them into a component tree. Splitting the page into components gives each part one responsibility and makes it possible to reuse, test, and change that part without rewriting the whole screen. A default export is imported without braces.
+Props are read-only values a parent passes to a child. Destructuring props in the function parameters makes the values a component needs explicit. This one-way data flow keeps the source of product information clear while letting one component render many products.
 
 ## What We Built in This Branch
 
-We divided the storefront into `Navbar`, `HeroBanner`, `ProductCard`, and `Footer`. `App` now acts as the page composer, while each child owns its markup.
+The featured furniture record now lives in `App` and supplies `ProductCard` with its title, price, image URL, material, and stock status. The card displays each value without owning or changing the product record.
 
 ## Key Files & Code Snippets
 
 ```jsx
-import Navbar from './components/Navbar.jsx';
-import HeroBanner from './components/HeroBanner.jsx';
-import ProductCard from './components/ProductCard.jsx';
-import Footer from './components/Footer.jsx';
-
-function App() {
-  return <><Navbar /><HeroBanner /><ProductCard /><Footer /></>;
+function ProductCard({ title, price, imageUrl, material, inStock }) {
+  return <article>
+    <img src={imageUrl} alt={title} />
+    <h3>{title}</h3>
+    <p>{material} · {inStock ? 'In stock' : 'Made to order'}</p>
+    <strong>${price.toFixed(2)}</strong>
+  </article>;
+}
+      <Navbar />
+      <HeroBanner />
+      <ProductCard />
+      <Footer />
+    </>
+  );
 }
 ```
 
-Each component is a separate module under `src/components/` and uses a default export. `App.jsx` imports those modules and arranges them in document order.
+`App` owns the `featuredProduct` object and passes it with `<ProductCard {...featuredProduct} />`. The child destructures its props and treats them as immutable inputs.
 
 ## DevTools & Debugging Tips (if applicable)
 
-Use React DevTools to inspect the component tree and confirm the page is composed from four children. Check that each module's default export name matches its import.
+Inspect `ProductCard` in React DevTools and compare its props with the `featuredProduct` object in `App`. Change one value in the parent and observe the child update.
 
 ## Exercise for Students
 
-Create a reusable `ButtonLink` component and replace one of the current text links with it.
+Add a `condition` prop and display a different note for new, vintage, or refurbished furniture.
