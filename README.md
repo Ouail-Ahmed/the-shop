@@ -1,16 +1,46 @@
-# React + Vite
+# The Shop
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React and Vite ecommerce web application.
 
-Currently, two official plugins are available:
+## Prerequisites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Node.js 20 or later
+- npm 10 or later
 
-## React Compiler
+## Getting started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Ouail-Ahmed/the-shop.git
+   cd the-shop
+   ```
 
-## Expanding the ESLint configuration
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+3. Configure environment variables:
+   ```bash
+   cp .env.example .env
+   ```
+
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+## Available scripts
+
+- `npm run dev`: Starts the Vite development server.
+- `npm run build`: Builds the production bundle in `dist`.
+- `npm run preview`: Locally previews the production build.
+- `npm run lint`: Runs ESLint across the codebase.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for vulnerability reporting procedures.
