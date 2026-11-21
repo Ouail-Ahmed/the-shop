@@ -1,29 +1,32 @@
-# Branch 14: 14-controlled-inputs-and-forms
+# Branch 14: Controlled inputs and forms
 
-## React Concept Covered
+## Changes from Lesson 13
 
-In a controlled input, React state is the source of truth: the element receives a `value`, and `onChange` updates that state. This keeps the displayed form value synchronized with application data and makes validation or previews straightforward.
+Lesson 13 let shoppers read product details but had no way to enter a new product. This branch adds an `/add-product` route and a form with controlled fields for a product name, category, price, image URL, and description. Submitting the form only reports that a draft is ready; it does not send or save the product yet. The API submission is added in lesson 15.
 
-## What We Built in This Branch
+## What changed and where
 
-We added `/add-product` with controlled fields for title, category, price, description, and image URL. The form reads and updates one state object, then previews the draft without sending it to the API yet.
+- `src/App.jsx` imports `AddProductPage` and registers the `/add-product` route.
+- `src/components/Navbar.jsx` adds an active-aware Add product link to the shared navigation.
+- `src/pages/AddProductPage.jsx` defines the initial form values and stores all fields in one `formData` state object. `handleChange` uses each control's `name` to update only that field while preserving the others.
+- The category `<select>` offers sofas, tables, chairs, and lamps. The title, price, image URL, and description controls use required constraints; price uses number/min/step attributes and the image field uses `type="url"`.
+- The submit handler prevents the browser's default navigation and reveals a status message with the draft title and category. `src/index.css` styles the form, wide description field, and feedback.
 
-## Key Files & Code Snippets
+## React concept
 
-```jsx
-<input name="title" value={formData.title} onChange={handleChange} />
-function handleChange(event) {
-  const { name, value } = event.target;
-  setFormData((current) => ({ ...current, [name]: value }));
-}
-```
+A controlled input takes its displayed `value` from React state, and its `onChange` handler updates that state. The `name` attribute lets one change handler serve every field. Copying the current object with a spread avoids mutating state or erasing values in other fields.
 
-Type in each field and inspect React DevTools to see `formData` update. Confirm number, URL, and required constraints with the browser's built-in validation.
+## Check the result
 
-## DevTools & Debugging Tips (if applicable)
+Open `/add-product`, enter values, and inspect `formData` in React DevTools as you type. Submit an incomplete form and observe native validation; complete it and confirm the "Draft ready" status appears. No network POST should occur in this lesson.
 
-The `name` attribute lets one change handler update any field. The spread copies the previous object so changing one field preserves the rest.
+## Exercise
 
-## Exercise for Students
+Add a controlled `material` field and include it in the draft feedback or preview.
 
-Add a `material` field and show it in the draft preview.
+## Read on react.dev
+
+These pages cover forms driven by state.
+
+- [Reacting to input with state](https://react.dev/learn/reacting-to-input-with-state)
+- [Updating objects in state](https://react.dev/learn/updating-objects-in-state)
