@@ -1,29 +1,30 @@
-# Branch 06: 06-click-events-and-dev-tools
+# Branch 06: Click events and DevTools
 
-## React Concept Covered
+## Changes from Lesson 05
 
-React event props such as `onClick` receive a function. Pass the function itself when no arguments are needed; use a callback such as `onClick={() => handle(id)}` when values must be supplied. React's event system delivers browser interactions to these handlers without manually wiring DOM listeners.
+Lesson 05 made the card's product values arrive as props. This branch also passes the product `id` from `App` into `ProductCard` and adds two buttons beneath the stock status. The buttons demonstrate React click events, but they do not yet open a product view or save a wishlist item: both actions currently log the selected ID to the browser console.
 
-## What We Built in This Branch
+## What changed and where
 
-The featured product card now has Quick View and Add to Wishlist buttons. Their handlers log the product ID, making it easy to verify which item each interaction targets.
+- `src/App.jsx` adds `id={featuredProduct.id}` to the explicit props it passes to `ProductCard`.
+- `src/components/ProductCard.jsx` now destructures `id`, defines `handleQuickView` and `handleWishlist`, and attaches them to the new buttons with `onClick`.
+- Quick View passes the function itself as `onClick={handleQuickView}` because it needs no arguments. Wishlist wraps the call, `onClick={() => handleWishlist(id)}`, because the handler needs an argument. The mistake to avoid is `onClick={handleQuickView()}`: the parentheses call the function while the card renders, not when the user clicks. A short comment in `ProductCard.jsx` explains all three forms.
+- `src/index.css` adds styling for the `.product-actions` button group and its hover state.
 
-## Key Files & Code Snippets
+## React concept
 
-```jsx
-function handleQuickView() {
-  console.log('Quick view product:', id);
-}
-<button type="button" onClick={handleQuickView}>Quick View</button>
-<button type="button" onClick={() => handleWishlist()}>Add to Wishlist</button>
-```
+React event props receive functions; do not call a handler while rendering. Here both handlers close over the `id` prop, so they can identify which card was clicked without manually registering DOM listeners.
 
-The direct handler reference is enough for `handleQuickView`; the callback form is useful when arguments are needed. Both handlers close over the `id` prop.
+## Check the result
 
-## DevTools & Debugging Tips (if applicable)
+Open the browser console and click both actions. Each should log the card's product ID with a different label. In React DevTools, confirm that the `id` prop matches the product shown by the card.
 
-Open the browser console, click each button, then inspect `ProductCard` props in React DevTools to compare the logged ID with the rendered item.
+## Exercise
 
-## Exercise for Students
+Replace the Quick View console message with a dialog that displays the product title, and close the dialog when its close button is clicked.
 
-Change the Quick View handler to open a small dialog that displays the product title.
+## Read on react.dev
+
+These pages cover event handlers, the idea in this lesson.
+
+- [Responding to events](https://react.dev/learn/responding-to-events)
