@@ -1,32 +1,54 @@
-# Branch 04: 04-components-and-reusability
+# Branch 04: Components and reusability
 
-## React Concept Covered
+## Changes from Lesson 03
 
-Components are functions that return UI, and a parent can compose them into a component tree. Splitting the page into components gives each part one responsibility and makes it possible to reuse, test, and change that part without rewriting the whole screen. A default export is imported without braces.
+Lesson 03 rendered the store as one component in `src/App.jsx`. This lesson keeps the existing Craft & Oak design tokens and responsive styling, but divides the storefront into separate components so each section has a clear owner. `App` now assembles the page from a navigation header, a hero, a featured product, and a footer. The hero receives its message and store name from `App` as props.
 
-## What We Built in This Branch
+## What changed and where
 
-We divided the storefront into `Navbar`, `HeroBanner`, `ProductCard`, and `Footer`. `App` now acts as the page composer, while each child owns its markup.
+- `src/App.jsx` imports and composes the four child components in page order. It also keeps the store name, banner message, founding year, and price calculation, and passes the hero text as props.
+- `src/components/Navbar.jsx` owns the Craft & Oak wordmark and the links to the collection and story sections.
+- `src/components/HeroBanner.jsx` owns the hero image, headline, supporting copy, and collection link. Its `message` and `storeName` parameters are props supplied by `App`.
+- `src/components/ProductCard.jsx` owns the Rowan Side Table image, product title, material/origin line, and price display.
+- `src/components/Footer.jsx` owns the closing store name and tagline, and provides the `about` anchor target used by the navigation.
+- `src/index.css` adds the page frame, header/footer, hero, featured section, and product-card layout rules while retaining the shared color, type, and spacing tokens from lesson 03.
 
-## Key Files & Code Snippets
+The main React idea is composition: each component returns one part of the interface, and `App` puts those parts together. Each module uses a default export, so it is imported without braces.
 
 ```jsx
-import Navbar from './components/Navbar.jsx';
-import HeroBanner from './components/HeroBanner.jsx';
-import ProductCard from './components/ProductCard.jsx';
-import Footer from './components/Footer.jsx';
+import Footer from "./components/Footer.jsx";
+import HeroBanner from "./components/HeroBanner.jsx";
+import Navbar from "./components/Navbar.jsx";
+import ProductCard from "./components/ProductCard.jsx";
 
 function App() {
-  return <><Navbar /><HeroBanner /><ProductCard /><Footer /></>;
+  return (
+    <div className="site-frame">
+      <Navbar />
+      <main>
+        <HeroBanner message={bannerMessage} storeName={storeName} />
+        <section className="featured-section" id="collection">
+          <ProductCard />
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
 }
 ```
 
-Each component is a separate module under `src/components/` and uses a default export. `App.jsx` imports those modules and arranges them in document order.
+## Debugging
 
-## DevTools & Debugging Tips (if applicable)
+Use React DevTools to inspect the component tree and confirm the page is composed from the four child components. Check that each component's default export matches its import. The hero's `message` and `storeName` props should match the values defined in `src/App.jsx`.
 
-Use React DevTools to inspect the component tree and confirm the page is composed from four children. Check that each module's default export name matches its import.
-
-## Exercise for Students
+## Exercise
 
 Create a reusable `ButtonLink` component and replace one of the current text links with it.
+
+## Read on react.dev
+
+These pages cover components, imports, and props, the ideas in this lesson.
+
+- [Your first component](https://react.dev/learn/your-first-component)
+- [Importing and exporting components](https://react.dev/learn/importing-and-exporting-components)
+- [Passing props to a component](https://react.dev/learn/passing-props-to-a-component)
