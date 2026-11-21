@@ -1,27 +1,35 @@
-# Branch 11: 11-conditional-rendering-and-loading-states
+# Branch 11: Conditional rendering and loading states
 
-## React Concept Covered
+## Changes from Lesson 10
 
-Conditional rendering lets a component match its UI to its current state. Use a ternary when choosing between two outputs and `condition && element` when an element is optional. Loading, success, and error are distinct states and should be rendered intentionally.
+Lesson 10 fetched products but left a blank catalog while the request was pending and only logged failures to the console. This branch adds explicit loading and error state so the catalog communicates what is happening before it renders the successful result. The API request and abort cleanup remain in `ProductList`.
 
-## What We Built in This Branch
+## What changed and where
 
-The catalog now shows a skeleton while the request is pending and an accessible error banner if the API request fails. `isLoading` and `error` are separate state values alongside the product array.
+- `src/components/ProductList.jsx` adds one `status` state that is `"loading"`, `"success"`, or `"error"`, starting at `"loading"`. The request sets `"success"` after the products arrive and `"error"` on failure, unless the request was aborted. A separate `errorMessage` state holds the failure text and is only read when `status` is `"error"`.
+- While loading, the component renders a polite live region with a loading label and two skeleton placeholders marked `aria-hidden`.
+- If the request fails, it renders an `.error-banner` with `role="alert"` and tells the user to start the JSON Server with `npm run server`. There is no retry button in this checkpoint.
+- After a successful request, the existing product grid renders the fetched products as keyed cards.
+- `src/index.css` adds the skeleton layout, animated placeholder style, and responsive adjustments for the loading UI.
 
-## Key Files & Code Snippets
+## React concept
 
-```jsx
-if (isLoading) return <CatalogSkeleton />;
-if (error) return <p role="alert">Unable to load the furniture catalog.</p>;
-return products.map((product) => <ProductCard key={product.id} {...product} />);
-```
+Conditional rendering maps state to the appropriate UI. The early returns keep the three outcomes distinct: pending, failed, and successful.
 
-Throttle the Network panel to observe the loading state. Stop JSON Server to confirm the error banner appears and that it is announced by assistive technology through `role="alert"`.
+The three outcomes live in one `status` value on purpose. The obvious first attempt is two separate values, `isLoading` and `error`. Two values allow four combinations, and some of them make no sense, such as loading and failed at the same time. If one update is forgotten, the screen shows a contradiction. One `status` makes those impossible states impossible. React's guide calls this "avoid contradictory state" in its Choosing the state structure page. The later fetching components in this course use the same pattern. `role="alert"` announces an important error to assistive technology, while the loading region uses `aria-live="polite"`.
 
-## DevTools & Debugging Tips (if applicable)
+## Check the result
 
-Use `&&` for a brief optional status label and a ternary when the UI must choose between two equally meaningful states.
+Throttle the Network panel to see the skeleton before the products arrive. Then stop JSON Server and reload: the alert should replace the catalog and explain how to start the API. Restart the server and confirm the product grid returns.
 
-## Exercise for Students
+## Exercise
 
-Add a retry button that starts the request again after a failure.
+Add a retry button that starts a new catalog request after an error. Keep using `status`: set it back to `"loading"` when the user clicks retry.
+
+## Read on react.dev
+
+These pages cover conditional rendering and how to structure state for a request.
+
+- [Conditional rendering](https://react.dev/learn/conditional-rendering)
+- [Reacting to input with state](https://react.dev/learn/reacting-to-input-with-state)
+- [Choosing the state structure](https://react.dev/learn/choosing-the-state-structure)
