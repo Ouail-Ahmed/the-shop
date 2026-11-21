@@ -1,32 +1,38 @@
-# React + Vite
+# Branch 01: Setup and app structure
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Before you start
 
-Currently, two official plugins are available:
+- Use Node 22.13 or newer. The tooling in this project (Vite and ESLint) requires it. Check with `node --version`.
+- Run `npm install` after every branch switch. Each lesson branch can have different dependencies.
+- Start the app with `npm run dev` and open the address it prints.
+- From lesson 09 you also need `npm run server` in a second terminal. It runs the local product API.
+- You need an internet connection. Product images load from Unsplash.
 
-# Branch 01: 01-setup-and-app-structure
+## Changes from the Vite starter
 
-## React Concept Covered
-Vite serves the project during development and bundles it for production. The browser loads `index.html`, whose module script points to `src/main.jsx`. That entry imports the global stylesheet and the root `App` component, then `createRoot` connects React to the `#root` DOM element. JSX lets a component describe the UI with markup-like syntax inside JavaScript.
+This branch replaces the default Vite/React demo screen with the first Craft & Oak Furniture storefront view. The app is still a single React component, but it now has store-specific content and a semantic `<main>` landmark. The browser tab and page description are also branded for the store.
 
-## What We Built in This Branch
-We removed the starter screen and established the Craft & Oak Furniture identity with a semantic page container, a title, and a short store description. The HTML document now carries the store title and description too.
+## What changed and where
 
-## Key Files & Code Snippets
-```jsx
-function App() {
-	return (
-		<main className="store-shell">
-			<h1>Craft &amp; Oak Furniture</h1>
-			<p>Furniture made for the shape of everyday life.</p>
-		</main>
-	);
-}
-```
-`src/main.jsx` mounts `<App />` into the element with `id="root"`.
+- `src/App.jsx` now returns a `<main className="store-shell">` containing the store heading and introductory sentence. This replaces the starter counter/demo UI.
+- `index.html` keeps the `#root` mount point and module script for `/src/main.jsx`, and sets the document title, theme color, and description for Craft & Oak.
+- `src/main.jsx` remains the startup path: it imports the global stylesheet and `App`, then uses `createRoot` to mount the app into `#root`.
 
-## DevTools & Debugging Tips (if applicable)
-Inspect `#root` in the browser Elements panel and confirm React has rendered the heading. Vite's terminal output reports compile errors and exposes the local development URL.
+## React and Vite concepts
 
-## Exercise for Students
-Change the supporting sentence and confirm Vite updates the page without a full reload.
+Vite serves `index.html` in development and bundles the application for production. The module script loads `src/main.jsx`; that file mounts `App` into the empty `#root` element. JSX lets `App` describe the rendered semantic HTML inside JavaScript. The `&amp;` entity in the heading displays an ampersand while keeping the JSX text valid.
+
+## Check the result
+
+Run the Vite development server and confirm the page shows "Craft & Oak Furniture" and its supporting sentence. Inspect `index.html` for the document metadata and the browser Elements panel for the rendered `<main>` inside `#root`.
+
+## Exercise
+
+Change the supporting sentence in `src/App.jsx` and confirm Vite updates the page without a full reload.
+
+## Read on react.dev
+
+These pages cover the ideas in this lesson.
+
+- [Your first component](https://react.dev/learn/your-first-component)
+- [Writing markup with JSX](https://react.dev/learn/writing-markup-with-jsx)
