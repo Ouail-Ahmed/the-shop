@@ -1,28 +1,30 @@
-# Branch 02: 02-dynamic-values-and-jsx
+# Branch 02: Dynamic values and JSX
 
-## React Concept Covered
+## Changes from Lesson 01
 
-JSX expressions use curly braces to evaluate JavaScript while React renders. Strings and numbers become text, while booleans, `null`, and plain objects do not render as ordinary text. Expressions can also calculate values before they reach the UI.
+Lesson 01 hard-coded the store heading and a static supporting sentence in `src/App.jsx`. This lesson moves the repeated store details and promotional content into local JavaScript constants, then inserts those values into JSX. It also replaces a static price with a price calculated from the original amount and a discount rate. The component and document structure remain otherwise unchanged.
 
-## What We Built in This Branch
+## What changed and where
 
-We introduced store metadata, a promotional message, the founding year, and a sale price calculated from an original price and discount rate.
+- `src/App.jsx` defines `storeName`, `establishedYear`, and `bannerMessage`, then renders them inside the heading, promotional eyebrow, and store-history sentence.
+- The same component defines `originalPrice` and `discountRate`, calculates `salePrice`, and displays the original amount in `<del>` beside the sale amount in `<strong>`.
+- Currency output uses `toFixed(2)` so both values display two decimal places. No new component or stylesheet is added in this lesson.
 
-## Key Files & Code Snippets
+## React concept
 
-```jsx
-const originalPrice = 240;
-const discountRate = 0.15;
-const salePrice = originalPrice * (1 - discountRate);
-return <strong>${salePrice.toFixed(2)}</strong>;
-```
+Curly braces in JSX evaluate JavaScript expressions. They can read a variable such as `{bannerMessage}` or render a calculation such as `{salePrice.toFixed(2)}`. Keep the dollar sign outside the expression as JSX text. Strings and numbers render as text; booleans, `null`, and plain objects do not render as ordinary text.
 
-Use `{bannerMessage}` for plain dynamic text and `${salePrice.toFixed(2)}` for a formatted currency value. JSX still requires one parent element for the returned markup.
+## Check the result
 
-## DevTools & Debugging Tips (if applicable)
+Inspect the rendered page and confirm that the founding year and banner match their constants. Change `discountRate` in `src/App.jsx`; the sale price should change while the JSX structure stays the same.
 
-Inspect the rendered text in the Elements panel. Try interpolating a boolean or object to see why those values are not useful as visible JSX text.
+## Exercise
 
-## Exercise for Students
+Add a `currencyCode` constant and display it next to both the original and sale prices.
 
-Change `discountRate` and display a different sale price without editing the JSX structure.
+## Read on react.dev
+
+These pages cover the ideas in this lesson.
+
+- [JavaScript in JSX with curly braces](https://react.dev/learn/javascript-in-jsx-with-curly-braces)
+- [Writing markup with JSX](https://react.dev/learn/writing-markup-with-jsx)
