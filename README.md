@@ -1,31 +1,32 @@
-# Branch 10: 10-useeffect-and-data-fetching
+# Branch 10: Effects and data fetching
 
-## React Concept Covered
+## Changes from Lesson 09
 
-Effects synchronize a component with systems outside React, such as a network API. The dependency array controls when the effect runs: `[]` runs after mount, `[value]` reruns when `value` changes, and omitting the array runs after every render. Fetching belongs in an effect rather than during rendering.
+Lesson 09 prepared `data/db.json` and JSON Server, while the catalog still read from `src/data/products.js`. This branch removes that local product module and makes `ProductList` load the catalog from the API. The server must now be running for products to appear. Loading and failure feedback are not rendered yet; this branch only logs non-abort request errors, with dedicated UI added in lesson 11.
 
-## What We Built in This Branch
+## What changed and where
 
-`ProductList` now fetches furniture from JSON Server when it mounts. The static product module is removed, and an abort cleanup prevents a completed request from updating an unmounted component.
+- `src/components/ProductList.jsx` owns an initially empty `products` state and starts `loadProducts` in a `useEffect` with an empty dependency array.
+- The effect requests `${API_URL}/products`, checks `response.ok`, parses the JSON, and stores the returned array. The existing `.map()` then renders each record as a keyed `ProductCard`, forwarding the cart callback.
+- An `AbortController` is passed to `fetch`; the effect cleanup aborts the request if `ProductList` unmounts. The catch ignores abort errors and logs other failures to the console.
+- `src/api.js` is new. It exports `API_URL = "http://localhost:8000"`, the one place that names the server address. Every request in the app builds its URL from it, so changing the port later means editing one line.
+- `src/data/products.js` is deleted, making the API the catalog's source instead of a local import.
 
-## Key Files & Code Snippets
+## React concept
 
-```jsx
-useEffect(() => {
-  const controller = new AbortController();
-  fetch("http://localhost:8000/products", { signal: controller.signal })
-    .then((response) => response.json())
-    .then(setProducts);
-  return () => controller.abort();
-}, []);
-```
+An effect synchronizes a component with an external system such as a network API. An empty dependency array runs this request after the list mounts, not during render. Cleanup prevents a request from continuing after its owning component is removed.
 
-Run `npm run server` before opening the app. Check the Network panel for the `/products` request and its JSON response. The empty dependency array means the catalog is requested when the list mounts.
+## Check the result
 
-## DevTools & Debugging Tips (if applicable)
+Start JSON Server with `npm run server`, open the app, and inspect the Network panel for `GET http://localhost:8000/products` (the value of `API_URL` plus `/products`). Stop the API and check the browser console: the request error is logged, but this lesson does not yet show a loading or error message in the page.
 
-Try changing the effect dependencies and observe how often the request runs. Keep network work out of the component's render body.
+## Exercise
 
-## Exercise for Students
+Filter the fetched array before mapping it so the catalog can show one category only.
 
-Filter the fetched array before rendering to show only one furniture category.
+## Read on react.dev
+
+These pages cover effects and when an effect is the right tool. Fetching on mount is the classic case.
+
+- [Synchronizing with effects](https://react.dev/learn/synchronizing-with-effects)
+- [You might not need an effect](https://react.dev/learn/you-might-not-need-an-effect)
