@@ -1,30 +1,32 @@
-# Branch 15: 15-submit-event-and-post-request
+# Branch 15: Form submission and POST requests
 
-## React Concept Covered
+## Changes from Lesson 14
 
-The browser's default form submission navigates away and reloads the page. Calling `event.preventDefault()` keeps the SPA in control. A JSON `POST` request declares its content type and serializes the payload with `JSON.stringify` before sending it to the API.
+Lesson 14 kept the product form in React state and only showed a local "Draft ready" message. This branch replaces that preview submission with a request to create a persistent product through JSON Server. The route and controlled fields remain the same, while `AddProductPage` now owns the pending, success, and failure states for the request. It keeps them in one `status` value, as lesson 11 did for the catalog.
 
-## What We Built in This Branch
+## What changed and where
 
-Submitting `/add-product` now sends the controlled values to `POST /products`. The payload converts the price to a number, and the page reports pending, success, or failure feedback.
+- `src/pages/AddProductPage.jsx` changes `handleSubmit` to prevent the browser's default form navigation, set pending state, clear old feedback, and build a product payload from `formData`. `status` is `"idle"`, `"submitting"`, `"success"`, or `"error"`, and a separate `errorMessage` holds the failure text.
+- The payload converts `price` from the input's string to a number and sets `inStock: true`. `fetch` sends it as JSON to `POST ${API_URL}/products` (`API_URL` comes from `src/api.js`) with the `Content-Type: application/json` header.
+- The form submit button is disabled and reads "Saving..." while `status` is `"submitting"`. A successful response sets `"success"` and shows a status message; a non-OK response or network failure sets `"error"` and shows an alert. Because there is one value, the form can never show success and an error together.
+- JSON Server writes the new record into `data/db.json`; no catalog component changes are needed because lesson 10 already reads from the API.
+- The response body is parsed, but this branch does not yet use the returned ID to redirect. That behavior is added in lesson 16.
 
-## Key Files & Code Snippets
+## Browser and API concepts
 
-```jsx
-event.preventDefault();
-await fetch("http://localhost:8000/products", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ ...formData, price: Number(formData.price) }),
-});
-```
+Calling `event.preventDefault()` keeps the browser from navigating away during form submission. JSON requests declare their content type and serialize the payload with `JSON.stringify`. A resolved `fetch` promise is not necessarily a successful HTTP response, so the code checks `response.ok` before showing success.
 
-Watch the Network panel for the POST method, JSON request body, and created product response. Refresh `GET /products` and confirm the record persisted in `data/db.json`.
+## Check the result
 
-## DevTools & Debugging Tips (if applicable)
+Start JSON Server, submit a valid product, and inspect the Network panel for the POST method, JSON body, and response. Request `GET /products` again or inspect `data/db.json` to confirm the new record was saved. Stop the server and submit again to verify the form displays an error and becomes usable after the request finishes.
 
-The server treats this mock write as persistence by updating the JSON file. The client must check `response.ok`; a resolved fetch promise does not guarantee a successful HTTP status.
+## Exercise
 
-## Exercise for Students
+Show the created product's returned ID in the success feedback, then use that ID to build a link to its detail page.
 
-Show the created product ID in the success feedback, then use it to build a detail-page link.
+## Read on react.dev
+
+These pages cover forms that send data. The last page explains why the request state is one `status` value.
+
+- [Reacting to input with state](https://react.dev/learn/reacting-to-input-with-state)
+- [Choosing the state structure](https://react.dev/learn/choosing-the-state-structure)
