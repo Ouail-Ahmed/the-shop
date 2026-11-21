@@ -1,27 +1,35 @@
-# Branch 16: 16-redirects-and-404-page
+# Branch 16: Redirects and not-found pages
 
-## React Concept Covered
+## Changes from Lesson 15
 
-`useNavigate` changes the current route from code after an action succeeds. A wildcard route (`path="*"`) catches URLs that do not match another route, giving users a useful recovery path instead of a blank screen.
+Lesson 15 saved a new product and showed a success message on the form. This branch uses the product ID returned by the successful POST to take the user directly to the new product's detail page. It also adds a fallback route for URLs that do not match any declared page. The product-detail page's own error for an unknown product ID remains separate from this app-wide fallback.
 
-## What We Built in This Branch
+## What changed and where
 
-After a successful product POST, the form navigates to the new product's detail route using the ID returned by the API. A custom wildcard page handles unknown paths and links back to the collection.
+- `src/pages/AddProductPage.jsx` imports `useNavigate`. After checking `response.ok` and parsing the response, it navigates to `/products/${createdProduct.id}`. Failed submissions stay on the form and set `status` to `"error"`, so the error alert still shows. The `"success"` status from lesson 15 is gone, because a successful save leaves the page.
+- `src/App.jsx` imports `NotFoundPage` and adds a final `<Route path="*">` so unmatched paths render a recovery screen.
+- `src/pages/NotFoundPage.jsx` explains that the requested page or item is missing and provides a React Router link back to `/shop`.
+- `src/index.css` adds layout and typography styles for the not-found view.
 
-## Key Files & Code Snippets
+## React Router concept
 
-```jsx
-const createdProduct = await response.json();
-navigate(`/products/${createdProduct.id}`);
-<Route path="*" element={<NotFoundPage />} />;
-```
+React Router is not part of React itself. `useNavigate()` changes the current route from an event handler after an operation succeeds. A wildcard route (`path="*"`) is the final catch-all for unmatched URLs. It does not replace the loading and error handling in `ProductDetails` for a valid `/products/:id` route whose API record does not exist.
 
-Submit a new item and confirm the URL changes to `/products/:id`. Then open an unknown path and use the 404 page's link to return to the catalog.
+## Check the result
 
-## DevTools & Debugging Tips (if applicable)
+With JSON Server running, submit a valid new item and confirm the URL changes to the new `/products/:id` path and the detail page displays the saved record. Then visit an unrelated path such as `/missing-page` and use the not-found page's link to return to Shop. Finally, visit `/products/not-a-product` to see the distinct product-specific error.
 
-Only navigate after checking `response.ok` and parsing the successful response; otherwise keep the form visible and show the submission error.
+## Exercise
 
-## Exercise for Students
+Improve the unknown-product state inside `src/pages/ProductDetails.jsx` with a link back to `/shop`, without changing the wildcard page used for unmatched URLs.
 
-Add a not-found state for an unknown product ID that offers a route back to `/shop`.
+## Read on react.dev
+
+Routing is not part of React itself, so react.dev has no page for redirects or not-found routes. Use the React Router site for this lesson. The react.dev page below covers the state structure used by the form.
+
+- [React Router (not part of React)](https://reactrouter.com/)
+- [Choosing the state structure](https://react.dev/learn/choosing-the-state-structure)
+
+## Formatting polish
+
+This branch also has a small formatting pass over `src/main.jsx`, `src/pages/HomePage.jsx`, `src/pages/ShopPage.jsx`, `src/components/ProductList.jsx`, `src/components/Footer.jsx`, `src/pages/NotFoundPage.jsx`, and `src/pages/AddProductPage.jsx`. It only changes quotes, line breaks, and final newlines. No behavior changes.
