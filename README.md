@@ -1,27 +1,31 @@
-# Branch 08: 08-rendering-lists
+# Branch 08: Rendering product lists
 
-## React Concept Covered
+## Changes from Lesson 07
 
-Arrays can be transformed into UI with `.map()`. Each sibling rendered from an array needs a stable, unique `key` so React can match items as the list changes. Product IDs are preferable to array indexes because they identify the same record across reorders and updates.
+Lesson 07 rendered one featured product card. This branch replaces that single card with a catalog of four furniture records. The product details move into a data module, and a new `ProductList` component turns the array into reusable cards. The cart callback still flows down from `App`, and each rendered card keeps its own quantity state.
 
-## What We Built in This Branch
+## What changed and where
 
-We moved four furniture records into `src/data/products.js` and added `ProductList`, which maps those records to reusable cards. Each card receives its product data and quantity state remains isolated to that product.
+- `src/data/products.js` exports four product objects: sofa, side table, lounge chair, and lamp. Each record has a stable `id`, title, price, image URL, material, and stock flag.
+- `src/components/ProductList.jsx` imports the array, maps each record to a `ProductCard`, sets `key={product.id}`, and forwards `onAddToCart` to each card. It writes the props as `{...product}`, the spread shorthand from lesson 05, because every field of the record is a prop the card accepts.
+- `src/App.jsx` replaces its single `ProductCard` with `ProductList` and passes the existing cart callback into the list.
+- `src/index.css` styles the list as a product grid and adjusts the catalog layout for smaller screens.
 
-## Key Files & Code Snippets
+## React concept
 
-```jsx
-{
-  products.map((product) => <ProductCard key={product.id} {...product} />);
-}
-```
+Use `.map()` to transform data into repeated UI. The `key` belongs on the element returned directly from the map so React can track that product as the list changes. A key is an internal reconciliation hint; it is not automatically passed as a prop. Since each map iteration creates its own `ProductCard`, each card has independent quantity state.
 
-The `key` belongs on the element returned directly from `.map()`. It is an internal reconciliation hint and is not automatically passed as a regular prop.
+## Check the result
 
-## DevTools & Debugging Tips (if applicable)
+Confirm all four products render and the browser console has no missing-key warning. Change the order of the records in `src/data/products.js` and verify the cards follow that order. Change quantity for one card and confirm it does not change the others.
 
-Temporarily change product order and confirm the stable IDs keep item state attached to the right furniture record. Check the console for missing-key warnings if a key is removed.
+## Exercise
 
-## Exercise for Students
+Add a fifth product object with a unique ID and verify the catalog renders it without adding another card element in JSX.
 
-Add a fifth product record and confirm the catalog renders it without duplicating JSX.
+## Read on react.dev
+
+These pages cover rendering lists with keys, and the state each card keeps.
+
+- [Rendering lists](https://react.dev/learn/rendering-lists)
+- [Keeping components pure](https://react.dev/learn/keeping-components-pure)
