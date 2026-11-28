@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "api": "npm --prefix server run dev",
     "server": "json-server --watch data/db.json --port 8000",
     "build": "vite build",
     "lint": "eslint .",
