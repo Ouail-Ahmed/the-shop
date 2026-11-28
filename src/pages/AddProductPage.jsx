@@ -11,7 +11,7 @@ const initialFormData = {
   imageUrl: "",
 };
 
-function AddProductPage() {
+function AddProductPage({ accessToken }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState(initialFormData);
   const [status, setStatus] = useState("idle"); // "idle" | "submitting" | "error"
@@ -35,11 +35,22 @@ function AddProductPage() {
     try {
       const response = await fetch(`${API_URL}/products`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          // The API checks this header. Without a valid admin token it answers
+          // 401 (not logged in) or 403 (logged in, but not an admin).
+          ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+        },
         body: JSON.stringify(product),
       });
       const data = await response.json();
-      // The API explains validation failures as { error: "..." }.
+      // The API explains failures as { error: "..." }.
+      if (response.status === 401) {
+        throw new Error("Please log in as an admin to add products");
+      }
+      if (response.status === 403) {
+        throw new Error("Only admins can add products");
+      }
       if (!response.ok) {
         throw new Error(data.error ?? "Could not save this furniture piece");
       }

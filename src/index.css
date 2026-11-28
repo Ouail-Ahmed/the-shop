@@ -140,9 +140,20 @@ a {
 }
 
 .site-nav a,
+.site-nav button,
 .header-note {
   font-size: var(--text-sm);
   text-decoration: none;
+}
+
+.site-nav button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
 }
 
 .site-nav a.active {

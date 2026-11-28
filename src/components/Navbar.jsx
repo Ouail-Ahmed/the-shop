@@ -1,6 +1,6 @@
 import { Link, NavLink } from "react-router-dom";
 
-function Navbar({ cartCount }) {
+function Navbar({ cartCount, user, onLogout }) {
   return (
     <header className="site-header">
       <Link className="wordmark" to="/">
@@ -11,7 +11,16 @@ function Navbar({ cartCount }) {
           Home
         </NavLink>
         <NavLink to="/shop">Shop</NavLink>
-        <NavLink to="/add-product">Add product</NavLink>
+        {user?.role === "admin" && (
+          <NavLink to="/add-product">Add product</NavLink>
+        )}
+        {user ? (
+          <button type="button" onClick={onLogout}>
+            Log out ({user.email})
+          </button>
+        ) : (
+          <NavLink to="/login">Log in</NavLink>
+        )}
       </nav>
       <Link className="header-note" to="/shop">
         Small-batch furniture
