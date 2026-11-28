@@ -1,48 +1,51 @@
-# Branch 21: Register and log in users
+# Branch 22: Protect routes and log in from React
 
-## Changes from Lesson 20
+## Changes from Lesson 21
 
-Lesson 20 stored products in MongoDB. This branch adds users. `POST /v1/auth/register` creates a customer account and `POST /v1/auth/login` checks a password. Both answer with `{ user, accessToken }`, where the access token is a signed JWT that expires after 15 minutes. Passwords are never stored: the database keeps a salted scrypt hash. Nothing is protected yet and the React app is unchanged. Lesson 22 uses the token to guard routes and adds a login page.
+Lesson 21 could issue tokens but nothing checked them. This branch makes the server check them and teaches the React app to log in. `POST /v1/products` now requires a valid access token (401 if it is missing, invalid or expired) and the role `admin` (403 for everyone else). In React, a new login page at `/login` stores the user and token in `App`, the Navbar shows Log in or Log out, and only admins see the Add product link. The Add product page sends the token in an `Authorization` header and shows the 401 or 403 message.
 
 ## What changed and where
 
-- `server/database/schemas/userSchema.mjs` defines `id`, a unique `email`, `passwordHash`, `salt` and `role` (`"customer"` by default, or `"admin"`). Its `toJSON` transform removes `_id`, `__v`, `passwordHash` and `salt`, so a user object can never leak them.
-- `server/database/usersDb.mjs` is the user version of `productsDb`: a frozen object with `findByEmail` and `insert`.
-- `server/model/user.mjs` exports `buildUser`. It lowercases the email, checks its shape, requires a password of 8 to 128 characters, hashes it and returns the entity. It never reads a role from the request, so nobody can register as an admin. It reuses `ValidationError` from the product model.
-- `server/helper/passwordHelper.mjs` hashes with `crypto.scrypt` and a random 16-byte salt per password, and compares with `crypto.timingSafeEqual`.
-- `server/helper/jwtHelper.mjs` signs and verifies tokens with `jsonwebtoken`: algorithm HS256, the secret from `JWT_SECRET`, `sub` set to the user id, a `role` claim and `expiresIn: "15m"`. Verification names the allowed algorithm. `assertJwtConfig` makes the server refuse to start when the secret is missing or shorter than 32 characters.
-- `server/service/auth/registerUser.mjs` and `loginUser.mjs` hold the steps. A duplicate email becomes a `DuplicateEmailError`. `loginUser` runs a password check against a decoy hash when the email is unknown, so timing does not reveal which emails exist.
-- `server/controller/auth/postRegister.mjs` answers 201, 400 for invalid input or 409 for a taken email. `postLogin.mjs` answers 200, or 401 with the same message `Invalid email or password` for a wrong email or a wrong password.
-- `server/route/authRoutes.mjs` is mounted at `/v1/auth` in `server/server.js`.
-- `server/scripts/seed.mjs` also creates or updates an admin user from `ADMIN_EMAIL` and `ADMIN_PASSWORD`. `server/.env.example` lists `JWT_SECRET`, `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
+- `server/middleware/verifyJwt.mjs` reads `Authorization: Bearer <token>`, verifies it with `verifyAccessToken` and sets `req.user = { id, role }`. A missing, malformed, invalid or expired token gets 401 and a `WWW-Authenticate` header. It does not log the token and does not explain why it failed.
+- `server/middleware/verifyRole.mjs` is a factory: `verifyRole("admin")` returns a middleware that answers 403 when `req.user.role` is not in the allowed list. It answers 401 if no user was set, which means `verifyJwt` was not run before it.
+- `server/route/productRoutes.mjs` puts them in front of the controller: `productRouter.post("/", verifyJwt, verifyRole("admin"), handleExpress(postProduct))`. `GET` routes stay public. The controller, service and database files do not change.
+- `src/pages/LoginPage.jsx` posts the email and password to `/auth/login`, calls `onLogin({ user, accessToken })` and navigates to `/add-product` for an admin or `/shop` for a customer. A failed login shows the server's error in an alert.
+- `src/App.jsx` holds `auth` (`null` or `{ user, accessToken }`) in state, adds the `/login` route, passes `onLogout` and the user to `Navbar`, and passes the token to `AddProductPage`.
+- `src/components/Navbar.jsx` shows the Add product link only when `user.role === "admin"`, and a Log in link or a Log out button.
+- `src/pages/AddProductPage.jsx` adds the `Authorization` header when a token exists and turns 401 and 403 into readable messages.
+- `src/index.css` styles the Log out button like the nav links.
 
-## Authentication concept
+## Authorization concept
 
-A password hash is a one-way fingerprint. `scrypt` is deliberately slow and uses memory, so guessing passwords is expensive, and the per-user salt means two users with the same password have different hashes. A JWT has three parts: a header, a payload and a signature. Anyone can read the payload, so never put secrets in it. Only the server can create a valid signature, so a tampered token fails verification.
+Authentication asks who you are. Authorization asks what you may do. They fail differently: 401 means the server does not know who is calling, so logging in may help. 403 means the server knows and the answer is no, so logging in again will not help.
 
-The reference server in the course material signs tokens with RS256, which uses a private and public key pair. That is useful when other services must verify tokens without being able to create them. This course uses HS256 with one shared secret, which is simpler and fine for a single server.
+Hiding the Add product link is only a convenience. The server is the real guard, because anyone can send a request with curl. Never rely on React to enforce access.
+
+The token is kept in React state, in memory only. A script injected into the page cannot read it from `localStorage` because it is not there, which is safer. The cost is that a refresh or a new tab logs the user out, and the token expires after 15 minutes anyway. The usual fix is a refresh token in an `httpOnly` cookie, which JavaScript cannot read. The reference server's login flow uses this idea, and `cookie-parser` and `credentials: true` in the CORS setup are already in place for it.
 
 ## Check the result
 
-1. In `server/`, copy `.env.example` to `.env`. Set `JWT_SECRET` to a long random value (the example comment shows how to generate one) and choose an `ADMIN_PASSWORD`. Start MongoDB.
-2. Run `npm --prefix server install`, then `npm --prefix server run seed`. Expect `Seeded 4 products` and `Admin user ready: ...`.
-3. Run `npm run api`. With the placeholder `JWT_SECRET=replace-me` it stops with `Could not start`, which is the intended safety check.
-4. Register: `curl -i -X POST -H "Content-Type: application/json" -d "{\"email\":\"bob@example.com\",\"password\":\"password123\"}" http://localhost:5000/v1/auth/register`. Expect 201, a user with role `customer` and no password fields, and an `accessToken`.
-5. Repeat it for 409. Send a 5-character password for 400. Add `"role":"admin"` to the body and confirm the role is still `customer`.
-6. Log in with the right password for 200. Use a wrong password, then an unknown email, and confirm both give the same 401 body.
-7. Paste an `accessToken` into [jwt.io](https://jwt.io/) to read its payload (`sub`, `role`, `iat`, `exp`).
-8. Log in with the admin email and password from `.env` and confirm `"role":"admin"`.
-9. The React app still works as before. `npm run lint` and `npm run build` pass.
+1. Start MongoDB, then run `npm --prefix server run seed` so the admin user exists. Run `npm run api` and `npm run dev`.
+2. With curl, check the guard:
+   - `curl -i -X POST -H "Content-Type: application/json" -d "{}" http://localhost:5000/v1/products` returns 401.
+   - Register a customer (lesson 21), log in, and send the same request with `-H "Authorization: Bearer <token>"`. It returns 403.
+   - Log in as the admin and send a valid product body with the admin token. It returns 201.
+3. In the browser the Navbar shows Log in and no Add product link. Open `/add-product` directly and submit the form. The alert says to log in as an admin.
+4. Log in as a customer. The Navbar shows Log out and still no Add product link. Open `/add-product` directly and submit. The alert says only admins can add products.
+5. Log out, then log in with the admin email and password from `server/.env`. The Add product link appears, and a valid submission opens the new product.
+6. Refresh the page and confirm you are logged out. This is the in-memory tradeoff.
+7. Run `npm run lint` and `npm run build`.
 
 ## Exercise
 
-Add `GET /v1/auth/me`. Read the `Authorization: Bearer <token>` header, call `verifyAccessToken`, and return the user. Return 401 for a missing, invalid or expired token. Lesson 22 turns this idea into middleware.
+Keep the user logged in across refreshes without using `localStorage`. Add `POST /v1/auth/refresh` that reads a refresh token from an `httpOnly` cookie and returns a new access token. Set the cookie in the login controller with `res.cookie`, add `Set-Cookie` support to `handleExpress`, send `credentials: "include"` from `fetch`, and call refresh once when `App` loads. Then add `POST /v1/auth/logout` that clears the cookie.
 
 ## Read on the official docs
 
+- [Express: using middleware](https://expressjs.com/en/guide/using-middleware.html)
+- [Express: `res.cookie`](https://expressjs.com/en/5x/api.html#res.cookie)
 - [jsonwebtoken on npm](https://www.npmjs.com/package/jsonwebtoken)
 - [jwt.io introduction](https://jwt.io/introduction)
-- [Node.js `crypto.scrypt`](https://nodejs.org/api/crypto.html#cryptoscryptpassword-salt-keylen-options-callback)
-- [Node.js `crypto.timingSafeEqual`](https://nodejs.org/api/crypto.html#cryptotimingsafeequala-b)
-- [Mongoose: unique indexes](https://mongoosejs.com/docs/schematypes.html#indexes)
-- [Express: security best practices](https://expressjs.com/en/advanced/best-practice-security.html)
+- [MDN: 401 Unauthorized](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401)
+- [MDN: 403 Forbidden](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403)
+- [React: lifting state up](https://react.dev/learn/sharing-state-between-components)
