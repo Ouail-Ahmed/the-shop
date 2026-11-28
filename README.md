@@ -1,37 +1,46 @@
-# Branch 18: Serve products from layered routes
+# Branch 19: Create products and switch the app to Express
 
-## Changes from Lesson 17
+## Changes from Lesson 18
 
-Lesson 17 gave the server one health route. This branch makes it serve the catalog: `GET /v1/products` returns every product and `GET /v1/products/:id` returns one, or a 404 when the ID does not exist. The code is split into layers (route, controller, service, database), and each layer has one job. The data still comes from `data/db.json`, read with `fs/promises`, so no database is needed yet. The React app is unchanged and still uses JSON Server. The response shape here is different on purpose: Express wraps data in objects (`{ products: [...] }`, `{ product: {...} }`), while JSON Server returns bare arrays and objects. Lesson 19 switches the app over.
+Lesson 18 served products from Express while React still used JSON Server. This branch finishes the move. The server gains `POST /v1/products`, which validates input, builds a product with a generated ID, saves it to `data/db.json` and answers 201. The React app now calls Express at `http://localhost:5000/v1` and reads the wrapped responses (`data.products`, `data.product`). JSON Server is removed from the project.
 
 ## What changed and where
 
-- `server/route/productRoutes.mjs` maps URLs to controllers. `server/server.js` mounts it with `v1Router.use("/products", productRouter)`.
-- `server/handleExpress.mjs` is an adapter. A controller is a plain function that takes a small request object (`body`, `params`, `query`, `user`, and so on) and returns `{ headers, statusCode, body }`. The adapter calls it and sends the result with `res`. Unexpected errors become a 500 with a fixed message, and the real error is only logged.
-- `server/controller/products/getProducts.mjs` and `getProduct.mjs` decide the HTTP answer: 200 with the data, or 404 with `{ "error": "Product not found" }`.
-- `server/service/products/listProducts.mjs` and `findProduct.mjs` hold the application steps. They are thin now. Later lessons put rules here.
-- `server/database/productsDb.mjs` is the only file that knows where products live. It exports a frozen object with `findAll` and `findById`, and reads `data/db.json` on each call.
+- `server/helper/sanitize.mjs` exports `sanitizeText`. It turns non-strings into an empty string, removes control characters and angle brackets, collapses spaces and trims.
+- `server/model/product.mjs` exports `buildProduct`, a factory that cleans the text fields, checks every rule and returns a frozen product, or throws a `ValidationError`. Rules: `title`, `material`, `category` and `description` are not empty, `price` is a finite number above 0, `imageUrl` is a valid http or https URL, and `inStock` is a boolean. The ID comes from `crypto.randomUUID()`. Fields the model does not know, including an `id` sent by the client, are dropped.
+- `server/service/products/createProduct.mjs` builds the product and asks the database to save it.
+- `server/controller/products/postProduct.mjs` answers 201 with `{ product }`, or 400 with `{ error }` for a `ValidationError`. Any other error continues to `handleExpress`, which answers 500 without leaking details.
+- `server/database/productsDb.mjs` gains `insert`. It reads the file, appends the product and writes the file back. Inserts wait in a promise chain, so two requests at the same moment cannot overwrite each other.
+- `server/route/productRoutes.mjs` adds `productRouter.post("/", ...)`.
+- `src/api.js` sets `API_URL` to `http://localhost:5000/v1`.
+- `src/components/ProductList.jsx` reads `data.products`. `src/pages/ProductDetails.jsx` reads `data.product`.
+- `src/pages/AddProductPage.jsx` reads `data.product.id` after a successful save and shows the server's `error` text when the API answers 400. The form also gets a Material field, because the API now requires `material`.
+- The root `package.json` loses the `server` script and the `json-server` dependency, and `package-lock.json` is updated. Use `npm run api` and `npm run dev` instead.
 
 ## Express concept
 
-Layers keep each change small. The route knows URLs, the controller knows HTTP status codes, the service knows what the app does, and the database module knows how to store things. A controller that does not touch `req` and `res` can be called in a test with a plain object. The route parameter `:id` arrives as `httpRequest.params.id`.
+Never trust a request body. The model is the one place that decides what a valid product is, and the controller only translates the outcome into an HTTP status: 201 for created, 400 for input the client can fix. Returning the stored product in the response means the client learns the generated ID without a second request. The body-size limit from lesson 17 already protects this route from huge payloads.
 
 ## Check the result
 
-1. Run `npm run api`.
-2. `curl http://localhost:5000/v1/products` returns `{"products":[...]}` with the products from `data/db.json`.
-3. `curl http://localhost:5000/v1/products/sofa-01` returns `{"product":{...}}`.
-4. `curl -i http://localhost:5000/v1/products/nope` returns status 404 and `{"error":"Product not found"}`.
-5. Compare with JSON Server (`npm run server`, then `curl http://localhost:8000/products`). Note that it returns a bare array. This difference is why the React code changes in the next lesson.
-6. The React app still works with JSON Server. `npm run lint` and `npm run build` still pass.
+1. Run `npm --prefix server install` if needed, then `npm run api` in one terminal and `npm run dev` in another.
+2. Open the shop page and confirm the products load. In the Network panel the request goes to `localhost:5000/v1/products` and the body is `{ "products": [...] }`.
+3. Open a product and confirm the detail page loads. Open `/products/not-a-product` and confirm the error banner.
+4. Open Add product, fill in every field and submit. The app opens the new product's detail page.
+5. Check the API directly:
+   - `curl -i -X POST -H "Content-Type: application/json" -d "{\"title\":\"Test chair\",\"price\":99,\"imageUrl\":\"https://example.com/a.jpg\",\"material\":\"Oak\",\"category\":\"chairs\",\"inStock\":true,\"description\":\"A test\"}" http://localhost:5000/v1/products` returns 201 and a product with a UUID `id`.
+   - The same request with `"price":0` returns 400 and `{"error":"Price must be a number greater than 0"}`.
+6. Run `npm run lint` and `npm run build`.
+7. The saved product is now in `data/db.json`. Use `git checkout data/db.json` to remove test data before committing.
 
 ## Exercise
 
-Add a `category` query parameter: `GET /v1/products?category=chairs` should return only chairs. Read it from `httpRequest.query.category` in `getProducts.mjs`, pass it to the service, and filter in `productsDb.findAll`. Keep the route file unchanged.
+Add `DELETE /v1/products/:id`. Write `deleteProduct` in the controller, service and database layers, return 204 on success and 404 when the ID does not exist. Do not add a button in React yet. Lesson 22 shows how to restrict admin actions.
 
 ## Read on expressjs.com
 
-- [Routing](https://expressjs.com/en/guide/routing.html)
-- [Using middleware](https://expressjs.com/en/guide/using-middleware.html)
-- [`express.Router`](https://expressjs.com/en/5x/api.html#router)
-- [Node.js `fs/promises`](https://nodejs.org/api/fs.html#promises-api)
+- [Express API: `express.json`](https://expressjs.com/en/5x/api.html#express.json)
+- [Error handling](https://expressjs.com/en/guide/error-handling.html)
+- [Production best practices: security](https://expressjs.com/en/advanced/best-practice-security.html)
+- [MDN: HTTP response status codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
+- [MDN: Using the Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
