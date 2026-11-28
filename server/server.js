@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import corsOptions from "./config/corsOptions.mjs";
 import healthRouter from "./route/healthRoutes.mjs";
+import productRouter from "./route/productRoutes.mjs";
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(cookieParser());
 
 const v1Router = express.Router();
 v1Router.use("/health", healthRouter);
+v1Router.use("/products", productRouter);
 app.use("/v1", v1Router);
 
 // Runs when no route above matched.
