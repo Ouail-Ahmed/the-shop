@@ -1,43 +1,37 @@
-# Branch 17: Set up an Express server
+# Branch 18: Serve products from layered routes
 
-## Changes from Lesson 16
+## Changes from Lesson 17
 
-Lesson 16 finished the React app against JSON Server. This branch starts a second project inside the repo: a small Express API in `server/`, with its own `package.json`. It answers one request, `GET /v1/health`, and has the safety pieces every API needs from day one: security headers, a CORS allow list, a body size limit, a JSON 404 and an error handler. The React app does not change. It still talks to JSON Server on port 8000, and the next lessons move the data to Express one step at a time.
+Lesson 17 gave the server one health route. This branch makes it serve the catalog: `GET /v1/products` returns every product and `GET /v1/products/:id` returns one, or a 404 when the ID does not exist. The code is split into layers (route, controller, service, database), and each layer has one job. The data still comes from `data/db.json`, read with `fs/promises`, so no database is needed yet. The React app is unchanged and still uses JSON Server. The response shape here is different on purpose: Express wraps data in objects (`{ products: [...] }`, `{ product: {...} }`), while JSON Server returns bare arrays and objects. Lesson 19 switches the app over.
 
 ## What changed and where
 
-- `server/package.json` sets `"type": "module"` so the server uses ES modules, like the React code. The `start` script runs `node server.js`. The `dev` script runs `node --watch server.js`, which restarts on every saved change, so no extra tool is needed.
-- `server/server.js` builds the app. `helmet()` is applied once and sets security headers. `cors(corsOptions)` comes next, then `express.json({ limit: "10kb" })` and `express.urlencoded`, which parse request bodies and refuse large ones, and `cookie-parser`.
-- `server/config/corsOptions.mjs` holds the whitelist of browser origins: `http://localhost:5173` and `http://localhost:5174`. Any other origin gets a 403 JSON error. A request with no `Origin` header, such as curl, is allowed because CORS is a browser rule, not a firewall.
-- `server/route/healthRoutes.mjs` is a router with one route. `server.js` mounts it under a versioned router, so the full path is `/v1/health`. A `/v1` prefix lets a later `/v2` live next to it.
-- Two final middleware functions in `server.js`: one returns `{ "error": "Not found" }` with status 404 when no route matched, and one with four arguments, `(err, req, res, next)`, turns errors into JSON. It answers 400 for bad JSON, 413 for a body over the limit, and 500 with a fixed message for everything else. The real error goes to the server log, never to the client.
-- `server/.gitignore` keeps `node_modules` and `.env` out of git. `server/.env.example` lists `PORT`.
-- The root `package.json` gets an `api` script that runs the server's `dev` script. `eslint.config.js` ignores `server/`, because the root lint rules are written for browser code.
+- `server/route/productRoutes.mjs` maps URLs to controllers. `server/server.js` mounts it with `v1Router.use("/products", productRouter)`.
+- `server/handleExpress.mjs` is an adapter. A controller is a plain function that takes a small request object (`body`, `params`, `query`, `user`, and so on) and returns `{ headers, statusCode, body }`. The adapter calls it and sends the result with `res`. Unexpected errors become a 500 with a fixed message, and the real error is only logged.
+- `server/controller/products/getProducts.mjs` and `getProduct.mjs` decide the HTTP answer: 200 with the data, or 404 with `{ "error": "Product not found" }`.
+- `server/service/products/listProducts.mjs` and `findProduct.mjs` hold the application steps. They are thin now. Later lessons put rules here.
+- `server/database/productsDb.mjs` is the only file that knows where products live. It exports a frozen object with `findAll` and `findById`, and reads `data/db.json` on each call.
 
 ## Express concept
 
-Express is a chain of middleware. Each function receives `(req, res, next)` and either answers or calls `next()` to pass the request on. Order matters: security and parsing come first, routes next, the 404 after the routes, and the error handler last. Express 5 also passes errors from async handlers to the error handler for you.
-
-A router (`express.Router()`) is a mini app for one area. Mounting routers under `/v1` keeps `server.js` short as the API grows.
+Layers keep each change small. The route knows URLs, the controller knows HTTP status codes, the service knows what the app does, and the database module knows how to store things. A controller that does not touch `req` and `res` can be called in a test with a plain object. The route parameter `:id` arrives as `httpRequest.params.id`.
 
 ## Check the result
 
-1. From the repo root run `npm --prefix server install`, then `npm run api`. The terminal prints `API listening on http://localhost:5000`.
-2. In another terminal run `curl -i http://localhost:5000/v1/health`. Expect status 200, security headers such as `X-Content-Type-Options: nosniff`, and the body `{"status":"ok"}`.
-3. Run `curl -i http://localhost:5000/v1/nothing`. Expect status 404 and `{"error":"Not found"}`.
-4. Run `curl -H "Origin: http://evil.example" http://localhost:5000/v1/health`. Expect status 403 and `{"error":"Origin not allowed"}`. Repeat with `Origin: http://localhost:5173` and expect `{"status":"ok"}` plus an `Access-Control-Allow-Origin` header.
-5. Run `curl -X POST -H "Content-Type: application/json" -d "{bad" http://localhost:5000/v1/health`. Expect status 400 and `{"error":"Invalid JSON body"}`.
-6. Run `npm run lint` and `npm run build` at the root to confirm the React app is unaffected.
+1. Run `npm run api`.
+2. `curl http://localhost:5000/v1/products` returns `{"products":[...]}` with the products from `data/db.json`.
+3. `curl http://localhost:5000/v1/products/sofa-01` returns `{"product":{...}}`.
+4. `curl -i http://localhost:5000/v1/products/nope` returns status 404 and `{"error":"Product not found"}`.
+5. Compare with JSON Server (`npm run server`, then `curl http://localhost:8000/products`). Note that it returns a bare array. This difference is why the React code changes in the next lesson.
+6. The React app still works with JSON Server. `npm run lint` and `npm run build` still pass.
 
 ## Exercise
 
-Add `GET /v1/health/time` that returns `{ "time": <ISO date string> }`. Then change the port with `PORT=5001 npm --prefix server run start` and confirm the log line follows it. Later lessons read their settings from `.env`, so note that `process.env.PORT` is already how this server is configured.
+Add a `category` query parameter: `GET /v1/products?category=chairs` should return only chairs. Read it from `httpRequest.query.category` in `getProducts.mjs`, pass it to the service, and filter in `productsDb.findAll`. Keep the route file unchanged.
 
 ## Read on expressjs.com
 
-- [Express routing](https://expressjs.com/en/guide/routing.html)
-- [Writing middleware](https://expressjs.com/en/guide/writing-middleware.html)
-- [Error handling](https://expressjs.com/en/guide/error-handling.html)
-- [Production best practices: security](https://expressjs.com/en/advanced/best-practice-security.html)
-- [Helmet](https://helmetjs.github.io/)
-- [cors middleware](https://expressjs.com/en/resources/middleware/cors.html)
+- [Routing](https://expressjs.com/en/guide/routing.html)
+- [Using middleware](https://expressjs.com/en/guide/using-middleware.html)
+- [`express.Router`](https://expressjs.com/en/5x/api.html#router)
+- [Node.js `fs/promises`](https://nodejs.org/api/fs.html#promises-api)
