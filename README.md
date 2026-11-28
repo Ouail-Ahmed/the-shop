@@ -1,35 +1,43 @@
-# Branch 16: Redirects and not-found pages
+# Branch 17: Set up an Express server
 
-## Changes from Lesson 15
+## Changes from Lesson 16
 
-Lesson 15 saved a new product and showed a success message on the form. This branch uses the product ID returned by the successful POST to take the user directly to the new product's detail page. It also adds a fallback route for URLs that do not match any declared page. The product-detail page's own error for an unknown product ID remains separate from this app-wide fallback.
+Lesson 16 finished the React app against JSON Server. This branch starts a second project inside the repo: a small Express API in `server/`, with its own `package.json`. It answers one request, `GET /v1/health`, and has the safety pieces every API needs from day one: security headers, a CORS allow list, a body size limit, a JSON 404 and an error handler. The React app does not change. It still talks to JSON Server on port 8000, and the next lessons move the data to Express one step at a time.
 
 ## What changed and where
 
-- `src/pages/AddProductPage.jsx` imports `useNavigate`. After checking `response.ok` and parsing the response, it navigates to `/products/${createdProduct.id}`. Failed submissions stay on the form and set `status` to `"error"`, so the error alert still shows. The `"success"` status from lesson 15 is gone, because a successful save leaves the page.
-- `src/App.jsx` imports `NotFoundPage` and adds a final `<Route path="*">` so unmatched paths render a recovery screen.
-- `src/pages/NotFoundPage.jsx` explains that the requested page or item is missing and provides a React Router link back to `/shop`.
-- `src/index.css` adds layout and typography styles for the not-found view.
+- `server/package.json` sets `"type": "module"` so the server uses ES modules, like the React code. The `start` script runs `node server.js`. The `dev` script runs `node --watch server.js`, which restarts on every saved change, so no extra tool is needed.
+- `server/server.js` builds the app. `helmet()` is applied once and sets security headers. `cors(corsOptions)` comes next, then `express.json({ limit: "10kb" })` and `express.urlencoded`, which parse request bodies and refuse large ones, and `cookie-parser`.
+- `server/config/corsOptions.mjs` holds the whitelist of browser origins: `http://localhost:5173` and `http://localhost:5174`. Any other origin gets a 403 JSON error. A request with no `Origin` header, such as curl, is allowed because CORS is a browser rule, not a firewall.
+- `server/route/healthRoutes.mjs` is a router with one route. `server.js` mounts it under a versioned router, so the full path is `/v1/health`. A `/v1` prefix lets a later `/v2` live next to it.
+- Two final middleware functions in `server.js`: one returns `{ "error": "Not found" }` with status 404 when no route matched, and one with four arguments, `(err, req, res, next)`, turns errors into JSON. It answers 400 for bad JSON, 413 for a body over the limit, and 500 with a fixed message for everything else. The real error goes to the server log, never to the client.
+- `server/.gitignore` keeps `node_modules` and `.env` out of git. `server/.env.example` lists `PORT`.
+- The root `package.json` gets an `api` script that runs the server's `dev` script. `eslint.config.js` ignores `server/`, because the root lint rules are written for browser code.
 
-## React Router concept
+## Express concept
 
-React Router is not part of React itself. `useNavigate()` changes the current route from an event handler after an operation succeeds. A wildcard route (`path="*"`) is the final catch-all for unmatched URLs. It does not replace the loading and error handling in `ProductDetails` for a valid `/products/:id` route whose API record does not exist.
+Express is a chain of middleware. Each function receives `(req, res, next)` and either answers or calls `next()` to pass the request on. Order matters: security and parsing come first, routes next, the 404 after the routes, and the error handler last. Express 5 also passes errors from async handlers to the error handler for you.
+
+A router (`express.Router()`) is a mini app for one area. Mounting routers under `/v1` keeps `server.js` short as the API grows.
 
 ## Check the result
 
-With JSON Server running, submit a valid new item and confirm the URL changes to the new `/products/:id` path and the detail page displays the saved record. Then visit an unrelated path such as `/missing-page` and use the not-found page's link to return to Shop. Finally, visit `/products/not-a-product` to see the distinct product-specific error.
+1. From the repo root run `npm --prefix server install`, then `npm run api`. The terminal prints `API listening on http://localhost:5000`.
+2. In another terminal run `curl -i http://localhost:5000/v1/health`. Expect status 200, security headers such as `X-Content-Type-Options: nosniff`, and the body `{"status":"ok"}`.
+3. Run `curl -i http://localhost:5000/v1/nothing`. Expect status 404 and `{"error":"Not found"}`.
+4. Run `curl -H "Origin: http://evil.example" http://localhost:5000/v1/health`. Expect status 403 and `{"error":"Origin not allowed"}`. Repeat with `Origin: http://localhost:5173` and expect `{"status":"ok"}` plus an `Access-Control-Allow-Origin` header.
+5. Run `curl -X POST -H "Content-Type: application/json" -d "{bad" http://localhost:5000/v1/health`. Expect status 400 and `{"error":"Invalid JSON body"}`.
+6. Run `npm run lint` and `npm run build` at the root to confirm the React app is unaffected.
 
 ## Exercise
 
-Improve the unknown-product state inside `src/pages/ProductDetails.jsx` with a link back to `/shop`, without changing the wildcard page used for unmatched URLs.
+Add `GET /v1/health/time` that returns `{ "time": <ISO date string> }`. Then change the port with `PORT=5001 npm --prefix server run start` and confirm the log line follows it. Later lessons read their settings from `.env`, so note that `process.env.PORT` is already how this server is configured.
 
-## Read on react.dev
+## Read on expressjs.com
 
-Routing is not part of React itself, so react.dev has no page for redirects or not-found routes. Use the React Router site for this lesson. The react.dev page below covers the state structure used by the form.
-
-- [React Router (not part of React)](https://reactrouter.com/)
-- [Choosing the state structure](https://react.dev/learn/choosing-the-state-structure)
-
-## Formatting polish
-
-This branch also has a small formatting pass over `src/main.jsx`, `src/pages/HomePage.jsx`, `src/pages/ShopPage.jsx`, `src/components/ProductList.jsx`, `src/components/Footer.jsx`, `src/pages/NotFoundPage.jsx`, and `src/pages/AddProductPage.jsx`. It only changes quotes, line breaks, and final newlines. No behavior changes.
+- [Express routing](https://expressjs.com/en/guide/routing.html)
+- [Writing middleware](https://expressjs.com/en/guide/writing-middleware.html)
+- [Error handling](https://expressjs.com/en/guide/error-handling.html)
+- [Production best practices: security](https://expressjs.com/en/advanced/best-practice-security.html)
+- [Helmet](https://helmetjs.github.io/)
+- [cors middleware](https://expressjs.com/en/resources/middleware/cors.html)
