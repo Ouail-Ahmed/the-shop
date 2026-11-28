@@ -7,6 +7,8 @@ import connectDb from "./database/connection.mjs";
 import corsOptions from "./config/corsOptions.mjs";
 import healthRouter from "./route/healthRoutes.mjs";
 import productRouter from "./route/productRoutes.mjs";
+import authRouter from "./route/authRoutes.mjs";
+import { assertJwtConfig } from "./helper/jwtHelper.mjs";
 
 const app = express();
 
@@ -19,6 +21,7 @@ app.use(cookieParser());
 const v1Router = express.Router();
 v1Router.use("/health", healthRouter);
 v1Router.use("/products", productRouter);
+v1Router.use("/auth", authRouter);
 app.use("/v1", v1Router);
 
 // Runs when no route above matched.
@@ -46,11 +49,12 @@ const PORT = process.env.PORT || 5000;
 
 // Listen only after the database is ready, so no request reaches a dead store.
 try {
+  assertJwtConfig();
   await connectDb();
   console.log("Connected to MongoDB");
 } catch (err) {
-  console.error(`Could not connect to MongoDB: ${err.message}`);
-  console.error("Start MongoDB and check MONGO_URI in server/.env");
+  console.error(`Could not start: ${err.message}`);
+  console.error("Check MONGO_URI and JWT_SECRET in server/.env, and that MongoDB is running");
   process.exit(1);
 }
 
