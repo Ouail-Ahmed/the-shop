@@ -16,7 +16,8 @@ function ProductDetails({ id }) {
           signal: controller.signal,
         });
         if (!response.ok) throw new Error("Furniture item not found");
-        setProduct(await response.json());
+        const data = await response.json();
+        setProduct(data.product);
         setStatus("success");
       } catch (requestError) {
         if (requestError.name !== "AbortError") {

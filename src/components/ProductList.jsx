@@ -18,7 +18,8 @@ function ProductList({ onAddToCart }) {
           signal: controller.signal,
         });
         if (!response.ok) throw new Error("Could not load products");
-        setProducts(await response.json());
+        const data = await response.json();
+        setProducts(data.products);
         setStatus("success");
       } catch (error) {
         if (error.name !== "AbortError") {
@@ -47,8 +48,8 @@ function ProductList({ onAddToCart }) {
   if (status === "error") {
     return (
       <p className="error-banner" role="alert">
-        Unable to load the furniture catalog ({errorMessage}). Start JSON Server
-        with <code>npm run server</code> and try again.
+        Unable to load the furniture catalog ({errorMessage}). Start the Express API
+        with <code>npm run api</code> and try again.
       </p>
     );
   }

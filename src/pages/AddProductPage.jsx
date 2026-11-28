@@ -6,6 +6,7 @@ const initialFormData = {
   title: "",
   category: "chairs",
   price: "",
+  material: "",
   description: "",
   imageUrl: "",
 };
@@ -37,9 +38,12 @@ function AddProductPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(product),
       });
-      if (!response.ok) throw new Error("Could not save this furniture piece");
-      const createdProduct = await response.json();
-      navigate(`/products/${createdProduct.id}`);
+      const data = await response.json();
+      // The API explains validation failures as { error: "..." }.
+      if (!response.ok) {
+        throw new Error(data.error ?? "Could not save this furniture piece");
+      }
+      navigate(`/products/${data.product.id}`);
     } catch (error) {
       setErrorMessage(error.message);
       setStatus("error");
@@ -83,6 +87,15 @@ function AddProductPage() {
             min="0"
             step="0.01"
             value={formData.price}
+            onChange={handleChange}
+            required
+          />
+        </label>
+        <label>
+          Material
+          <input
+            name="material"
+            value={formData.material}
             onChange={handleChange}
             required
           />
