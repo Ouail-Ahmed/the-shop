@@ -1,34 +1,23 @@
-import { readFile, writeFile } from "node:fs/promises";
+import Product from "./schemas/productSchema.mjs";
 
-// The file store from the json-server days. Lesson 20 replaces this module
-// with MongoDB and keeps the same function names.
-const DB_FILE = new URL("../../data/db.json", import.meta.url);
-
-async function readDatabase() {
-  return JSON.parse(await readFile(DB_FILE, "utf8"));
-}
-
-// Writes wait for each other, so two requests cannot overwrite one another.
-let writeQueue = Promise.resolve();
-
+// Same function names as the file store from lessons 18 and 19, so routes,
+// controllers and services did not need any change.
+// find() returns Mongoose documents. lean() would skip our toJSON cleanup,
+// so we convert with toJSON() ourselves.
 async function findAll() {
-  return (await readDatabase()).products;
+  const products = await Product.find().sort({ _id: 1 });
+  return products.map((product) => product.toJSON());
 }
 
 async function findById(id) {
-  const products = await findAll();
-  return products.find((product) => product.id === id) ?? null;
+  // String() blocks query objects such as { "$ne": null } in the URL or body.
+  const product = await Product.findOne({ id: String(id) });
+  return product ? product.toJSON() : null;
 }
 
-function insert(product) {
-  const task = writeQueue.then(async () => {
-    const database = await readDatabase();
-    database.products.push(product);
-    await writeFile(DB_FILE, `${JSON.stringify(database, null, 2)}\n`);
-    return product;
-  });
-  writeQueue = task.catch(() => {});
-  return task;
+async function insert(product) {
+  const created = await Product.create(product);
+  return created.toJSON();
 }
 
 const productsDb = Object.freeze({ findAll, findById, insert });

@@ -1,7 +1,9 @@
+import "dotenv/config";
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import connectDb from "./database/connection.mjs";
 import corsOptions from "./config/corsOptions.mjs";
 import healthRouter from "./route/healthRoutes.mjs";
 import productRouter from "./route/productRoutes.mjs";
@@ -41,6 +43,16 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
+
+// Listen only after the database is ready, so no request reaches a dead store.
+try {
+  await connectDb();
+  console.log("Connected to MongoDB");
+} catch (err) {
+  console.error(`Could not connect to MongoDB: ${err.message}`);
+  console.error("Start MongoDB and check MONGO_URI in server/.env");
+  process.exit(1);
+}
 
 app.listen(PORT, () => {
   console.log(`API listening on http://localhost:${PORT}`);
